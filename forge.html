@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="description" content="Forge — Miten's AI workout coach. PPL programme, session logging, live exercise science research.">
+<title>Forge — AI Workout Coach</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Bebas+Neue&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+
+[data-theme="dark"]{
+  --bg:#0a0804;--s1:#111009;--s2:#18150e;--s3:#201c14;--s4:#2a251a;
+  --b1:rgba(255,160,60,.06);--b2:rgba(255,160,60,.12);--b3:rgba(255,160,60,.2);
+  --t1:#f5f0e8;--t2:#9a9080;--t3:#504840;
+  --red:#ff4530;--orange:#ff8c30;--amber:#ffb830;--yellow:#ffd060;
+  --fire:linear-gradient(135deg,#ff4530,#ff8c30);
+  --fire2:linear-gradient(135deg,#ff3020,#ff6020);
+  --green:#4ade80;--blue:#5b8ff9;--purple:#a78bfa;
+  --nav-bg:rgba(10,8,4,.94);
+}
+[data-theme="light"]{
+  --bg:#fff8f0;--s1:#fff;--s2:#fff0e4;--s3:#ffe4cc;--s4:#ffd4b0;
+  --b1:rgba(200,80,20,.07);--b2:rgba(200,80,20,.13);--b3:rgba(200,80,20,.22);
+  --t1:#1a1008;--t2:#6a5040;--t3:#a09080;
+  --red:#dc2626;--orange:#ea580c;--amber:#d97706;--yellow:#b45309;
+  --fire:linear-gradient(135deg,#dc2626,#ea580c);
+  --fire2:linear-gradient(135deg,#b91c1c,#c2410c);
+  --green:#16a34a;--blue:#2563eb;--purple:#7c3aed;
+  --nav-bg:rgba(255,248,240,.94);
+}
+
+html,body{min-height:100%;background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;transition:background .25s,color .25s}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px}
+.app{max-width:700px;margin:0 auto;padding:0 0 80px}
+
+/* ── NAV ── */
+.nav{display:flex;justify-content:space-between;align-items:center;padding:11px 16px;border-bottom:1px solid var(--b1);background:var(--nav-bg);backdrop-filter:blur(16px);position:sticky;top:0;z-index:300}
+.nav-left{display:flex;align-items:center;gap:10px}
+.forge-wordmark{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.08em;background:var(--fire);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.nav-sub{font-family:'Courier Prime',monospace;font-size:9px;color:var(--t3);letter-spacing:.08em}
+.nav-right{display:flex;gap:6px;align-items:center}
+.nav-back{font-size:11px;color:var(--t3);text-decoration:none;padding:5px 10px;border-radius:6px;border:1px solid var(--b1);background:var(--s2);transition:all .15s}
+.nav-back:hover{color:var(--t1)}
+.theme-btn{width:30px;height:30px;border-radius:7px;border:1px solid var(--b1);background:var(--s2);color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .15s}
+.theme-btn:hover{border-color:var(--orange);color:var(--orange)}
+
+/* ── HERO ── */
+.hero{padding:0;overflow:hidden;border-bottom:1px solid var(--b1);position:relative}
+.hero-bg{background:var(--s1);padding:22px 16px 18px}
+.hero-day-badge{font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:.2em;color:var(--orange);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.hero-day-badge::after{content:'';flex:1;height:1px;background:var(--b2)}
+.hero h1{font-family:'Bebas Neue',sans-serif;font-size:48px;line-height:.95;letter-spacing:.02em;margin-bottom:4px}
+.hero h1 .fire-text{background:var(--fire);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-muscle{font-size:13px;color:var(--t3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px}
+.hero-badges{display:flex;gap:5px;flex-wrap:wrap}
+.hbadge{font-size:9px;padding:3px 9px;border-radius:4px;font-weight:700;border:.5px solid transparent;letter-spacing:.04em;text-transform:uppercase}
+.hbadge.r{background:rgba(255,69,48,.1);color:var(--red);border-color:rgba(255,69,48,.25)}
+.hbadge.o{background:rgba(255,140,48,.1);color:var(--orange);border-color:rgba(255,140,48,.25)}
+.hbadge.g{background:rgba(74,222,128,.08);color:var(--green);border-color:rgba(74,222,128,.2)}
+
+/* ── WEEK STRIP ── */
+.week-strip{display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid var(--b1);background:var(--s2)}
+.day-cell{padding:10px 4px;text-align:center;border-right:.5px solid var(--b1);cursor:default}
+.day-cell:last-child{border-right:none}
+.day-cell.workout{cursor:pointer;transition:background .15s}
+.day-cell.workout:hover{background:var(--s3)}
+.day-cell.today{background:rgba(255,140,48,.08)}
+.day-name{font-size:8px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:5px}
+.day-ico{font-size:15px;line-height:1}
+.day-label{font-size:7px;font-weight:700;color:var(--t3);margin-top:3px;letter-spacing:.04em}
+.day-cell.workout .day-label{color:var(--orange)}
+.day-cell.today .day-name{color:var(--orange)}
+
+/* ── TABS ── */
+.tab-row{display:flex;gap:0;border-bottom:1px solid var(--b1);background:var(--bg);position:sticky;top:48px;z-index:200;backdrop-filter:blur(14px)}
+.tab{flex:1;padding:11px 8px;border:none;background:transparent;color:var(--t3);font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;letter-spacing:.04em;text-transform:uppercase;border-bottom:2px solid transparent}
+.tab.act{color:var(--orange);border-bottom-color:var(--orange)}
+.tab:hover:not(.act){color:var(--t2)}
+
+/* ── SESSION VIEW ── */
+.session-wrap{padding:0 16px}
+.rest-card{background:var(--s1);border:.5px solid var(--b1);border-radius:16px;padding:24px;text-align:center;margin:14px 0}
+.rest-ico{font-size:40px;margin-bottom:12px}
+.rest-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.05em;color:var(--t2);margin-bottom:6px}
+.rest-sub{font-size:12px;color:var(--t3);line-height:1.6}
+
+.session-hdr{display:flex;align-items:flex-start;justify-content:space-between;padding:14px 0 10px}
+.session-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.03em;line-height:1}
+.session-title .fire{background:var(--fire);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.session-sub{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-top:4px}
+.session-badge{font-family:'Bebas Neue',sans-serif;font-size:11px;padding:5px 12px;border-radius:4px;background:rgba(255,140,48,.1);color:var(--orange);border:.5px solid rgba(255,140,48,.3);letter-spacing:.1em;white-space:nowrap}
+
+/* ── EXERCISE ROWS ── */
+.ex-list{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.ex-card{background:var(--s1);border:.5px solid var(--b1);border-radius:14px;overflow:hidden;transition:border-color .15s;animation:fadeUp .35s ease both}
+.ex-card:hover{border-color:var(--b2)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.ex-top{display:flex;align-items:center;justify-content:space-between;padding:12px 13px}
+.ex-left{flex:1}
+.ex-muscle{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:3px}
+.ex-name{font-size:14px;font-weight:700;color:var(--t1);line-height:1.3}
+.ex-right{display:flex;gap:12px;align-items:center;flex-shrink:0}
+.ex-stat{text-align:center}
+.ex-stat-val{font-family:'Bebas Neue',sans-serif;font-size:22px;line-height:1;color:var(--orange)}
+.ex-stat-lbl{font-size:8px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-top:1px}
+.ex-divider{width:1px;height:32px;background:var(--b2)}
+
+/* LOG ROW */
+.ex-log{display:flex;gap:6px;padding:8px 13px;border-top:.5px solid var(--b1);background:var(--s2);align-items:center;flex-wrap:wrap}
+.log-check{width:24px;height:24px;border-radius:5px;border:2px solid var(--b2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;transition:all .15s;flex-shrink:0}
+.log-check.done{border-color:var(--orange);background:var(--orange)}
+.log-label{font-size:11px;color:var(--t3);flex:1}
+.log-kg{width:60px;padding:5px 8px;border-radius:7px;border:.5px solid var(--b2);background:var(--s1);color:var(--t1);font-size:12px;font-weight:700;text-align:center;outline:none;font-family:'DM Sans',sans-serif;transition:border-color .15s}
+.log-kg:focus{border-color:var(--orange)}
+.log-kg::placeholder{color:var(--t3)}
+
+/* ── PROGRESS BAR ── */
+.prog-wrap{background:var(--s1);border:.5px solid var(--b1);border-radius:14px;padding:13px;margin-bottom:12px}
+.prog-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+.prog-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t3)}
+.prog-pct{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--orange)}
+.prog-bar{height:5px;background:var(--b2);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;border-radius:3px;background:var(--fire);transition:width .5s ease}
+
+/* ── CARDIO ── */
+.cardio-wrap{background:var(--s1);border:.5px solid var(--b2);border-radius:14px;overflow:hidden;margin-bottom:12px}
+.cardio-hdr{padding:11px 13px;border-bottom:.5px solid var(--b1);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t2);display:flex;align-items:center;gap:7px}
+.cardio-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
+.cardio-item{padding:12px 10px;text-align:center;border-right:.5px solid var(--b1)}
+.cardio-item:last-child{border-right:none}
+.cardio-ico{font-size:20px;margin-bottom:5px}
+.cardio-val{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--orange);line-height:1}
+.cardio-lbl{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-top:2px}
+
+/* ── PROGRAMME TAB ── */
+.programme-wrap{padding:0 16px}
+.prog-day-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.prog-day-card{background:var(--s1);border:.5px solid var(--b1);border-radius:14px;padding:13px;cursor:pointer;transition:all .18s;animation:fadeUp .35s ease both}
+.prog-day-card:hover{border-color:var(--b2);transform:translateY(-1px)}
+.prog-day-card.active{border-width:1.5px}
+.prog-day-key{font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:.15em;color:var(--t3);margin-bottom:5px}
+.prog-day-label{font-family:'Bebas Neue',sans-serif;font-size:20px;line-height:1;margin-bottom:3px}
+.prog-day-sub{font-size:10px;color:var(--t3);line-height:1.4}
+.prog-day-bars{display:flex;gap:2px;margin-top:9px}
+.prog-day-bar{height:3px;flex:1;border-radius:2px}
+
+.prog-detail{background:var(--s1);border-radius:14px;overflow:hidden;margin-bottom:12px;animation:fadeUp .3s ease}
+.prog-detail-hdr{padding:12px 14px;border-bottom:.5px solid var(--b1)}
+.prog-detail-title{font-family:'Bebas Neue',sans-serif;font-size:22px;line-height:1}
+.prog-detail-sub{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-top:3px}
+.prog-ex-row{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:.5px solid var(--b1)}
+.prog-ex-row:last-child{border-bottom:none}
+.prog-ex-name{font-size:13px;font-weight:600;color:var(--t1)}
+.prog-ex-muscle{font-size:10px;color:var(--t3);margin-top:2px}
+.prog-ex-stats{text-align:right}
+.prog-ex-sets{font-family:'Bebas Neue',sans-serif;font-size:20px;line-height:1}
+.prog-ex-reps{font-size:10px;color:var(--t3)}
+
+/* ── HISTORY TAB ── */
+.history-wrap{padding:0 16px}
+.history-day{background:var(--s1);border:.5px solid var(--b1);border-radius:14px;overflow:hidden;margin-bottom:9px;animation:fadeUp .35s ease both}
+.hday-hdr{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;border-bottom:.5px solid var(--b1)}
+.hday-title{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.04em}
+.hday-date{font-family:'Courier Prime',monospace;font-size:10px;color:var(--t3)}
+.hday-pct{font-family:'Bebas Neue',sans-serif;font-size:16px}
+.hday-ex{display:flex;justify-content:space-between;align-items:center;padding:7px 13px;border-bottom:.5px solid var(--b1)}
+.hday-ex:last-child{border-bottom:none}
+.hday-ex-name{font-size:12px;color:var(--t2)}
+.hday-ex-detail{font-size:11px;color:var(--t3);font-family:'Courier Prime',monospace}
+
+/* ── CHAT ── */
+.chat-outer{padding:0 16px}
+.chat-wrap{background:var(--s1);border:.5px solid var(--b1);border-radius:18px;overflow:hidden}
+.chat-msgs{display:flex;flex-direction:column;gap:8px;padding:14px;min-height:200px;max-height:380px;overflow-y:auto}
+.bubble{padding:11px 14px;border-radius:14px;font-size:13px;line-height:1.7;white-space:pre-wrap;word-break:break-word;animation:fadeUp .3s ease}
+.bubble.ai{background:var(--s2);border:.5px solid var(--b1);border-radius:4px 14px 14px 14px;color:var(--t2)}
+.bubble.user{background:var(--fire);color:#fff;border-radius:14px 4px 14px 14px;align-self:flex-end;max-width:88%}
+.typing-dots{display:flex;gap:4px;padding:11px 14px;align-self:flex-start}
+.typing-dots span{width:6px;height:6px;border-radius:50%;background:var(--orange);animation:dot 1.2s ease-in-out infinite;opacity:.4}
+.typing-dots span:nth-child(2){animation-delay:.2s}.typing-dots span:nth-child(3){animation-delay:.4s}
+@keyframes dot{0%,80%,100%{transform:scale(.7);opacity:.4}40%{transform:scale(1.1);opacity:1}}
+.chat-chips{display:flex;flex-wrap:wrap;gap:5px;padding:8px 13px;border-top:.5px solid var(--b1);overflow-x:auto;-webkit-overflow-scrolling:touch}
+.chat-chips::-webkit-scrollbar{display:none}
+.chip{font-size:10px;padding:5px 11px;border-radius:99px;border:.5px solid var(--b2);background:var(--s2);color:var(--t2);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;white-space:nowrap;flex-shrink:0}
+.chip:hover{color:var(--orange);border-color:rgba(255,140,48,.3)}
+.chat-input-row{display:flex;gap:8px;padding:10px 13px;border-top:.5px solid var(--b1);align-items:flex-end}
+.ta-wrap{flex:1;background:var(--s2);border:.5px solid var(--b2);border-radius:13px;display:flex;align-items:flex-end;transition:border-color .15s}
+.ta-wrap:focus-within{border-color:rgba(255,140,48,.4)}
+.ta{flex:1;background:transparent;border:none;outline:none;color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;resize:none;line-height:1.5;padding:10px 12px;min-height:42px;max-height:110px;overflow-y:auto}
+.ta::placeholder{color:var(--t3)}
+.send-btn{width:38px;height:38px;border-radius:11px;border:none;background:var(--fire);color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .15s}
+.send-btn:hover{opacity:.85}
+.send-btn:disabled{background:var(--s3)!important;color:var(--t3);cursor:not-allowed}
+
+/* ── SEC ── */
+.sec{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);padding:0 16px;margin:14px 0 9px;display:flex;align-items:center;gap:8px}
+.sec::after{content:'';flex:1;height:.5px;background:var(--b1)}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--s2);border:.5px solid var(--b3);border-radius:12px;padding:10px 18px;font-size:12px;color:var(--t1);opacity:0;transition:all .3s;z-index:999;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── FOOTER ── */
+hr{border:none;border-top:.5px solid var(--b1);margin:24px 16px}
+.footer{text-align:center;padding:14px 20px 0;font-size:11px;color:var(--t3);line-height:2}
+
+/* ── LIGHT ── */
+[data-theme="light"] .chat-wrap{background:#fff}
+[data-theme="light"] .bubble.ai{background:#fff0e4;color:#6a5040}
+[data-theme="light"] .ta-wrap{background:#fff0e4;border-color:rgba(200,80,20,.15)}
+[data-theme="light"] .ex-card{background:#fff}
+[data-theme="light"] .prog-day-card{background:#fff}
+[data-theme="light"] .prog-detail{background:#fff}
+[data-theme="light"] .history-day{background:#fff}
+[data-theme="light"] .prog-wrap{background:#fff}
+[data-theme="light"] .cardio-wrap{background:#fff}
+[data-theme="light"] .rest-card{background:#fff}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-left">
+    <div class="forge-wordmark">FORGE</div>
+    <div class="nav-sub">AI WORKOUT COACH</div>
+  </div>
+  <div class="nav-right">
+    <a class="nav-back" href="apex.html">← Apex</a>
+    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-bg">
+    <div class="hero-day-badge" id="heroDayBadge">WEDNESDAY · WEEK 3</div>
+    <h1 id="heroTitle"><span class="fire-text">REST</span><br>DAY</h1>
+    <div class="hero-muscle" id="heroMuscle">Recovery · Mobility · Nutrition</div>
+    <div class="hero-badges">
+      <span class="hbadge r">Claude API</span>
+      <span class="hbadge o">Web Search</span>
+      <span class="hbadge g">Persistent Log</span>
+    </div>
+  </div>
+</div>
+
+<!-- WEEK STRIP -->
+<div class="week-strip" id="weekStrip"></div>
+
+<!-- TABS -->
+<div class="tab-row">
+  <button class="tab act" id="tabToday" onclick="switchTab('today')">Today</button>
+  <button class="tab" id="tabProgramme" onclick="switchTab('programme')">Programme</button>
+  <button class="tab" id="tabHistory" onclick="switchTab('history')">History</button>
+  <button class="tab" id="tabCoach" onclick="switchTab('coach')">Coach</button>
+</div>
+
+<!-- TODAY TAB -->
+<div id="viewToday">
+  <div class="session-wrap" id="sessionContent"></div>
+</div>
+
+<!-- PROGRAMME TAB -->
+<div id="viewProgramme" style="display:none">
+  <div class="sec">PPL Programme</div>
+  <div class="programme-wrap" id="programmeContent"></div>
+</div>
+
+<!-- HISTORY TAB -->
+<div id="viewHistory" style="display:none">
+  <div class="sec">Session history</div>
+  <div class="history-wrap" id="historyContent"></div>
+</div>
+
+<!-- COACH TAB -->
+<div id="viewCoach" style="display:none">
+  <div class="sec">Ask your coach</div>
+  <div class="chat-outer">
+    <div class="chat-wrap">
+      <div class="chat-msgs" id="chatMsgs">
+        <div class="bubble ai">What's up Miten 💪 I'm your Forge coach. I search live exercise science before every answer — so you get evidence-based advice, not bro-science. Ask me anything about training, nutrition or recovery.</div>
+      </div>
+      <div class="chat-chips" id="chatChips"></div>
+      <div class="chat-input-row">
+        <div class="ta-wrap">
+          <textarea class="ta" id="chatInput" placeholder="How much protein do I need? What's the best rep range for hypertrophy?…" rows="1" onkeydown="chatKey(event)" oninput="autoResize(this)"></textarea>
+        </div>
+        <button class="send-btn" id="sendBtn" onclick="sendChat()">↑</button>
+      </div>
+    </div>
+  </div>
+  <hr>
+  <div class="footer">Forge · AI Workout Coach · Built by Miten Chauhan<br><span style="color:var(--orange)">🔥</span> Part of the Apex AI Stack · <a href="https://miten.co.nz" style="color:var(--t2);text-decoration:none">miten.co.nz</a></div>
+</div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const API_URL = 'https://nexus-api.mitenchauhan08.workers.dev';
+const LOG_KEY = 'forge_log_v1';
+
+/* ── WORKOUT DATA ── */
+const WORKOUTS = {
+  2: { label:'PUSH', sub:'Chest · Shoulders · Triceps', color:'#ff4530', dim:'rgba(255,69,48,.1)', key:'TUE',
+    exs:[{n:'Bench Press',s:4,r:'6–8',m:'Chest'},{n:'Incline DB Press',s:3,r:'8–10',m:'Upper Chest'},{n:'Shoulder Press',s:3,r:'8–10',m:'Shoulders'},{n:'Lateral Raises',s:3,r:'12–15',m:'Side Delts'},{n:'Dips',s:3,r:'8–12',m:'Triceps'},{n:'Tricep Pushdowns',s:3,r:'10–12',m:'Triceps'}]},
+  4: { label:'PULL', sub:'Back · Biceps', color:'#5b8ff9', dim:'rgba(91,143,249,.1)', key:'THU',
+    exs:[{n:'Lat Pulldown',s:4,r:'8–10',m:'Lats'},{n:'Seated Cable Row',s:3,r:'8–10',m:'Mid Back'},{n:'Single Arm Row',s:3,r:'10',m:'Lats'},{n:'Face Pulls',s:3,r:'12–15',m:'Rear Delts'},{n:'DB Curls',s:3,r:'10–12',m:'Biceps'},{n:'Hammer Curls',s:3,r:'10–12',m:'Brachialis'}]},
+  6: { label:'LEGS', sub:'Quads · Hamstrings · Calves', color:'#ffd060', dim:'rgba(255,208,96,.1)', key:'SAT',
+    exs:[{n:'Squats',s:4,r:'6–10',m:'Quads'},{n:'Romanian Deadlift',s:3,r:'8–10',m:'Hamstrings'},{n:'Leg Curl',s:3,r:'10–12',m:'Hamstrings'},{n:'Calf Raises',s:3,r:'12–15',m:'Calves'},{n:'Lateral Raises',s:3,r:'12–15',m:'Side Delts'},{n:'Rear Delt Fly',s:3,r:'12–15',m:'Rear Delts'}]},
+  0: { label:'UPPER', sub:'Balanced Push · Pull', color:'#4ade80', dim:'rgba(74,222,128,.1)', key:'SUN',
+    exs:[{n:'Incline Bench',s:3,r:'8–10',m:'Upper Chest'},{n:'Chest Fly',s:3,r:'10–12',m:'Chest'},{n:'Lat Pulldown',s:3,r:'10',m:'Lats'},{n:'Row Variation',s:3,r:'10',m:'Back'},{n:'Lateral Raises',s:3,r:'12–15',m:'Side Delts'},{n:'Bicep Curl',s:3,r:'10–12',m:'Biceps'},{n:'OHP Tricep Ext.',s:3,r:'10–12',m:'Triceps'}]},
+};
+
+const DAY_NAMES = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+const DAY_FULL = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+const COACH_CHIPS = [
+  'How many sets for hypertrophy?',
+  'Best protein intake for my weight?',
+  'How long should I rest between sets?',
+  'Is PPL good for natural lifters?',
+  'How to break a strength plateau?',
+  'Should I train fasted?',
+];
+
+let sessionLog = {};
+let chatHistory = [];
+let chatBusy = false;
+let activeProgDay = null;
+
+const nzNow = new Date(new Date().toLocaleString('en-US', { timeZone: 'Pacific/Auckland' }));
+const DOW = nzNow.getDay();
+const todayWO = WORKOUTS[DOW] || null;
+
+/* ── STORAGE ── */
+async function loadLog() {
+  try {
+    const r = await window.storage.get(LOG_KEY);
+    sessionLog = r ? JSON.parse(r.value) : {};
+  } catch { sessionLog = {}; }
+}
+
+async function saveLog() {
+  try { await window.storage.set(LOG_KEY, JSON.stringify(sessionLog)); } catch {}
+}
+
+/* ── THEME ── */
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('themeBtn').textContent = isDark ? '☀️' : '🌙';
+}
+
+/* ── TABS ── */
+function switchTab(t) {
+  ['today','programme','history','coach'].forEach(v => {
+    document.getElementById('view' + v.charAt(0).toUpperCase() + v.slice(1)).style.display = v === t ? '' : 'none';
+    document.getElementById('tab' + v.charAt(0).toUpperCase() + v.slice(1)).classList.toggle('act', v === t);
+  });
+  if (t === 'history') renderHistory();
+  if (t === 'programme') renderProgramme();
+}
+
+/* ── HERO ── */
+function renderHero() {
+  const badge = document.getElementById('heroDayBadge');
+  const title = document.getElementById('heroTitle');
+  const muscle = document.getElementById('heroMuscle');
+  badge.textContent = `${DAY_FULL[DOW].toUpperCase()} · WEEK 3`;
+  if (todayWO) {
+    title.innerHTML = `<span class="fire-text">${todayWO.label}</span><br>DAY`;
+    muscle.textContent = todayWO.sub.toUpperCase();
+  } else {
+    title.innerHTML = `<span class="fire-text">REST</span><br>DAY`;
+    muscle.textContent = 'Recovery · Mobility · Nutrition';
+  }
+}
+
+/* ── WEEK STRIP ── */
+function renderWeekStrip() {
+  const el = document.getElementById('weekStrip');
+  el.innerHTML = DAY_NAMES.map((d, i) => {
+    const wo = WORKOUTS[i];
+    const isToday = i === DOW;
+    return `<div class="day-cell ${wo ? 'workout' : ''} ${isToday ? 'today' : ''}">
+      <div class="day-name">${d}</div>
+      <div class="day-ico">${wo ? '🔥' : '💤'}</div>
+      <div class="day-label">${wo ? wo.label : 'REST'}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ── TODAY SESSION ── */
+function renderToday() {
+  const el = document.getElementById('sessionContent');
+  if (!todayWO) {
+    el.innerHTML = `<div class="rest-card">
+      <div class="rest-ico">💤</div>
+      <div class="rest-title">REST DAY</div>
+      <div class="rest-sub">Recovery is where gains happen.<br>Stay active — walk, stretch, eat well.<br><br>Next session: check the Programme tab.</div>
+    </div>
+    <div class="sec">Post-session cardio</div>
+    ${cardioHTML()}
+    <hr><div class="footer">Forge · AI Workout Coach · Built by Miten Chauhan<br><span style="color:var(--orange)">🔥</span> Part of the Apex AI Stack · <a href="https://miten.co.nz" style="color:var(--t2);text-decoration:none">miten.co.nz</a></div>`;
+    return;
+  }
+
+  const todayKey = `${todayWO.key}_${nzNow.toDateString()}`;
+  if (!sessionLog[todayKey]) {
+    sessionLog[todayKey] = { day: todayWO.key, date: nzNow.toDateString(), exercises: todayWO.exs.map(() => ({ done: false, kg: '' })) };
+  }
+  const log = sessionLog[todayKey];
+  const doneCount = log.exercises.filter(e => e.done).length;
+  const pct = Math.round(doneCount / todayWO.exs.length * 100);
+
+  el.innerHTML = `
+    <div class="session-hdr">
+      <div>
+        <div class="session-title"><span class="fire">${todayWO.label}</span> DAY</div>
+        <div class="session-sub">${todayWO.sub}</div>
+      </div>
+      <div class="session-badge">WEEK 3</div>
+    </div>
+    <div class="prog-wrap">
+      <div class="prog-top">
+        <div class="prog-label">Session progress</div>
+        <div class="prog-pct">${doneCount}/${todayWO.exs.length} · ${pct}%</div>
+      </div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div>
+    </div>
+    <div class="ex-list">
+      ${todayWO.exs.map((ex, i) => {
+        const exLog = log.exercises[i];
+        return `<div class="ex-card" style="animation-delay:${i*0.06}s;border-color:${exLog.done ? todayWO.color + '40' : ''}">
+          <div class="ex-top">
+            <div class="ex-left">
+              <div class="ex-muscle">${ex.m}</div>
+              <div class="ex-name">${ex.n}</div>
+            </div>
+            <div class="ex-right">
+              <div class="ex-stat">
+                <div class="ex-stat-val" style="color:${todayWO.color}">${ex.s}</div>
+                <div class="ex-stat-lbl">Sets</div>
+              </div>
+              <div class="ex-divider"></div>
+              <div class="ex-stat">
+                <div class="ex-stat-val" style="color:${todayWO.color};font-size:16px">${ex.r}</div>
+                <div class="ex-stat-lbl">Reps</div>
+              </div>
+            </div>
+          </div>
+          <div class="ex-log">
+            <button class="log-check ${exLog.done ? 'done' : ''}" onclick="toggleEx('${todayKey}',${i})">${exLog.done ? '✓' : ''}</button>
+            <div class="log-label">${exLog.done ? '✓ Done' : 'Mark complete'}</div>
+            <input class="log-kg" type="number" placeholder="kg" value="${exLog.kg || ''}" oninput="setKg('${todayKey}',${i},this.value)" min="0" max="500">
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="sec">Post-session cardio</div>
+    ${cardioHTML()}
+    <hr><div class="footer">Forge · AI Workout Coach · Built by Miten Chauhan<br><span style="color:var(--orange)">🔥</span> Part of the Apex AI Stack · <a href="https://miten.co.nz" style="color:var(--t2);text-decoration:none">miten.co.nz</a></div>`;
+}
+
+function cardioHTML() {
+  return `<div class="cardio-wrap" style="margin:0 16px 14px">
+    <div class="cardio-hdr">🏃 Incline Treadmill Walk</div>
+    <div class="cardio-grid">
+      <div class="cardio-item"><div class="cardio-ico">⏱</div><div class="cardio-val">15</div><div class="cardio-lbl">Minutes</div></div>
+      <div class="cardio-item"><div class="cardio-ico">💨</div><div class="cardio-val">4.5–6</div><div class="cardio-lbl">km/h</div></div>
+      <div class="cardio-item"><div class="cardio-ico">📐</div><div class="cardio-val">8–12%</div><div class="cardio-lbl">Incline</div></div>
+    </div>
+  </div>`;
+}
+
+async function toggleEx(key, i) {
+  sessionLog[key].exercises[i].done = !sessionLog[key].exercises[i].done;
+  await saveLog();
+  renderToday();
+  const doneCount = sessionLog[key].exercises.filter(e => e.done).length;
+  if (doneCount === sessionLog[key].exercises.length) showToast('🔥 Session complete!');
+}
+
+async function setKg(key, i, v) {
+  sessionLog[key].exercises[i].kg = v;
+  await saveLog();
+}
+
+/* ── PROGRAMME ── */
+function renderProgramme() {
+  const el = document.getElementById('programmeContent');
+  const days = Object.entries(WORKOUTS);
+  el.innerHTML = `<div class="prog-day-grid">
+    ${days.map(([dow, wo], idx) => `
+      <div class="prog-day-card ${activeProgDay === dow ? 'active' : ''}" style="border-color:${activeProgDay === dow ? wo.color : ''};animation-delay:${idx*0.07}s" onclick="activeProgDay=activeProgDay==='${dow}'?null:'${dow}';renderProgramme()">
+        <div class="prog-day-key">${wo.key} · ${DOW == dow ? 'TODAY' : ''}</div>
+        <div class="prog-day-label" style="color:${wo.color}">${wo.label}</div>
+        <div class="prog-day-sub">${wo.sub}</div>
+        <div class="prog-day-bars">${wo.exs.map(() => `<div class="prog-day-bar" style="background:${activeProgDay === dow ? wo.color : 'var(--b2)'}"></div>`).join('')}</div>
+      </div>`).join('')}
+  </div>
+  ${activeProgDay ? (() => {
+    const wo = WORKOUTS[activeProgDay];
+    return `<div class="prog-detail" style="border:.5px solid ${wo.color}30">
+      <div class="prog-detail-hdr" style="background:${wo.dim}">
+        <div class="prog-detail-title" style="color:${wo.color}">${wo.key} · ${wo.label} DAY</div>
+        <div class="prog-detail-sub">${wo.sub}</div>
+      </div>
+      ${wo.exs.map(ex => `<div class="prog-ex-row">
+        <div><div class="prog-ex-name">${ex.n}</div><div class="prog-ex-muscle">${ex.m}</div></div>
+        <div class="prog-ex-stats">
+          <div class="prog-ex-sets" style="color:${wo.color}">${ex.s} <span style="font-size:12px;color:var(--t3)">sets</span></div>
+          <div class="prog-ex-reps">${ex.r} reps</div>
+        </div>
+      </div>`).join('')}
+    </div>`;
+  })() : ''}
+  <div class="sec">Post-session cardio</div>
+  ${cardioHTML()}
+  <hr><div class="footer">Forge · AI Workout Coach · Built by Miten Chauhan<br><span style="color:var(--orange)">🔥</span> Part of the Apex AI Stack · <a href="https://miten.co.nz" style="color:var(--t2);text-decoration:none">miten.co.nz</a></div>`;
+}
+
+/* ── HISTORY ── */
+function renderHistory() {
+  const el = document.getElementById('historyContent');
+  const entries = Object.entries(sessionLog).sort((a, b) => new Date(b[1].date) - new Date(a[1].date));
+  if (!entries.length) {
+    el.innerHTML = `<div style="text-align:center;padding:40px 16px;color:var(--t3)"><div style="font-size:32px;margin-bottom:12px;opacity:.4">📋</div><div style="font-size:14px;font-weight:500;color:var(--t2);margin-bottom:6px">No sessions logged yet</div><div style="font-size:12px">Complete exercises on the Today tab to build your history.</div></div>`;
+    return;
+  }
+  el.innerHTML = entries.map(([key, log], idx) => {
+    const wo = Object.values(WORKOUTS).find(w => w.key === log.day) || {};
+    const doneCount = log.exercises.filter(e => e.done).length;
+    const pct = log.exercises.length ? Math.round(doneCount / log.exercises.length * 100) : 0;
+    return `<div class="history-day" style="animation-delay:${idx*0.06}s">
+      <div class="hday-hdr">
+        <div>
+          <div class="hday-title" style="color:${wo.color || 'var(--orange)'}">${log.day} · ${wo.label || ''}</div>
+          <div class="hday-date">${log.date}</div>
+        </div>
+        <div class="hday-pct" style="color:${pct===100?'var(--green)':'var(--orange)'}">${pct}%</div>
+      </div>
+      ${log.exercises.map((ex, i) => {
+        const exData = wo.exs && wo.exs[i];
+        return `<div class="hday-ex">
+          <div class="hday-ex-name">${exData ? exData.n : 'Exercise ' + (i+1)} ${ex.done ? '✓' : ''}</div>
+          <div class="hday-ex-detail">${ex.kg ? ex.kg + 'kg' : '—'}</div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }).join('');
+}
+
+/* ── CHAT ── */
+function renderChips() {
+  document.getElementById('chatChips').innerHTML = COACH_CHIPS.map(c =>
+    `<button class="chip" onclick="chipSend('${c.replace(/'/g, "\\'")}')">${c}</button>`
+  ).join('');
+}
+
+function chipSend(msg) { document.getElementById('chatInput').value = msg; sendChat(); }
+function chatKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); } }
+function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 110) + 'px'; }
+
+function appendBubble(text, cls) {
+  const msgs = document.getElementById('chatMsgs');
+  const div = document.createElement('div');
+  div.className = `bubble ${cls}`;
+  div.textContent = text;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function showTyping() {
+  const msgs = document.getElementById('chatMsgs');
+  const d = document.createElement('div');
+  d.className = 'typing-dots'; d.id = 'typingDots';
+  d.innerHTML = '<span></span><span></span><span></span>';
+  msgs.appendChild(d);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function removeTyping() { const d = document.getElementById('typingDots'); if (d) d.remove(); }
+
+async function sendChat() {
+  if (chatBusy) return;
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = ''; input.style.height = 'auto';
+  document.getElementById('sendBtn').disabled = true;
+  chatBusy = true;
+  appendBubble(msg, 'user');
+  chatHistory.push({ role: 'user', content: msg });
+  showTyping();
+
+  const scheduleNote = todayWO
+    ? `Today is ${DAY_FULL[DOW]} — scheduled ${todayWO.label} day (${todayWO.sub}).`
+    : `Today is ${DAY_FULL[DOW]} — rest day.`;
+
+  const WO_SYS = `You are Forge, Miten's personal AI workout coach. You use evidence-based exercise science and search the web for current research before answering. Miten follows a PPL (Push/Pull/Legs) programme with an Upper day on Sunday. ${scheduleNote} Be direct, practical and motivating. No fluff. Keep responses under 200 words unless the question demands more.`;
+
+  try {
+    // Step 1 — search for live research
+    let research = '';
+    try {
+      const sr = await fetch(API_URL, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-5', max_tokens: 150,
+          system: 'Search for evidence-based fitness or nutrition information relevant to this question. Return ONLY a 2-3 sentence plain text summary of current research. No preamble.',
+          messages: [{ role: 'user', content: 'Exercise research for: ' + msg }],
+          tools: [{ type: 'web_search_20250305', name: 'web_search' }]
+        })
+      });
+      const sd = await sr.json();
+      const st = (sd.content || []).filter(b => b.type === 'text').map(b => b.text).join(' ');
+      if (st.trim()) research = '\n\nLIVE RESEARCH: ' + st.trim();
+    } catch {}
+
+    // Step 2 — answer with research
+    const resp = await fetch(API_URL, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5', max_tokens: 500,
+        system: WO_SYS + research,
+        messages: chatHistory.map(m => ({ role: m.role, content: m.content }))
+      })
+    });
+    const data = await resp.json();
+    const reply = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('') || 'No response. Try again.';
+    removeTyping();
+    appendBubble(reply, 'ai');
+    chatHistory.push({ role: 'assistant', content: reply });
+    if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20);
+  } catch(e) {
+    removeTyping();
+    if (e && e.message && e.message.includes('rate_limit')) {
+      appendBubble('⚠️ Rate limit hit — please wait 15 seconds and try again.', 'ai');
+    } else {
+      appendBubble('⚠️ Connection issue. Check your Cloudflare Worker.', 'ai');
+    }
+  }
+
+  chatBusy = false;
+  document.getElementById('sendBtn').disabled = false;
+}
+
+/* ── TOAST ── */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+/* ── INIT ── */
+async function init() {
+  await loadLog();
+  renderHero();
+  renderWeekStrip();
+  renderToday();
+  renderChips();
+}
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="description" content="Apex — Miten's personal agent dashboard. Command bar, morning brief, and 6 AI agents built with Claude API, Gmail MCP, web search and persistent storage.">
+<title>Apex — Mission Control · Miten Chauhan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+[data-theme="dark"]{
+  --bg:#080808;--s1:#0f0f0f;--s2:#141414;--s3:#1c1c1c;
+  --b1:rgba(255,255,255,.05);--b2:rgba(255,255,255,.09);--b3:rgba(255,255,255,.14);
+  --t1:#f0eeea;--t2:#9a9895;--t3:#4a4845;
+  --gold:#f0c46e;--gold2:#e6a832;--gold3:#c88c1a;
+  --gold-dim:rgba(240,196,110,.09);--gold-border:rgba(240,196,110,.22);
+  --green:#c9f06e;--blue:#6eaff0;--orange:#f0a56e;--purple:#c46ef0;--teal:#6ef0d4;--red:#f06e6e;
+  --nav-bg:rgba(8,8,8,.94);
+}
+[data-theme="light"]{
+  --bg:#f4f4f0;--s1:#fff;--s2:#f0f0eb;--s3:#e4e4de;
+  --b1:rgba(0,0,0,.06);--b2:rgba(0,0,0,.11);--b3:rgba(0,0,0,.16);
+  --t1:#1a1a18;--t2:#5a5a55;--t3:#9a9a90;
+  --gold:#9a6800;--gold2:#7a5000;--gold3:#5a3800;
+  --gold-dim:rgba(154,104,0,.08);--gold-border:rgba(154,104,0,.22);
+  --green:#4a8000;--blue:#1a5fb4;--orange:#b35c00;--purple:#6b3fa0;--teal:#0a6e6e;--red:#b03030;
+  --nav-bg:rgba(244,244,240,.94);
+}
+html,body{min-height:100%;background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;transition:background .25s,color .25s}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--b3);border-radius:3px}
+.app{max-width:700px;margin:0 auto;padding:0 0 80px}
+
+/* TOPBAR */
+.topbar{height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--b1);background:var(--nav-bg);backdrop-filter:blur(14px);position:sticky;top:0;z-index:300}
+.topbar-left{display:flex;align-items:center;gap:10px}
+.apex-logo{font-family:'DM Serif Display',serif;font-size:17px;letter-spacing:-.3px}
+.apex-logo em{color:var(--gold);font-style:italic}
+.live-pill{display:inline-flex;align-items:center;gap:5px;font-family:'Courier Prime',monospace;font-size:9px;color:var(--t3);background:var(--s2);border:.5px solid var(--b2);padding:3px 9px;border-radius:99px;letter-spacing:.06em}
+.ldot{width:5px;height:5px;border-radius:50%;background:var(--gold);animation:glow 2s infinite;flex-shrink:0}
+@keyframes glow{0%,100%{opacity:.35}50%{opacity:1}}
+.topbar-right{display:flex;gap:6px;align-items:center}
+.nav-back{font-size:11px;color:var(--t3);text-decoration:none;padding:5px 10px;border-radius:6px;border:1px solid var(--b1);background:var(--s2);transition:all .15s}
+.nav-back:hover{color:var(--t1)}
+.time-badge{font-family:'Courier Prime',monospace;font-size:11px;color:var(--t2);background:var(--s2);border:.5px solid var(--b2);padding:5px 11px;border-radius:6px}
+.theme-btn{width:30px;height:30px;border-radius:7px;border:1px solid var(--b1);background:var(--s2);color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .15s}
+.theme-btn:hover{border-color:var(--gold);color:var(--gold)}
+
+/* HERO */
+.hero{padding:22px 16px 18px;border-bottom:1px solid var(--b1);background:var(--s1)}
+.hero h1{font-family:'DM Serif Display',serif;font-size:28px;font-weight:400;letter-spacing:-.4px;line-height:1.1}
+.hero h1 em{color:var(--gold);font-style:italic}
+.hero-sub{font-size:12px;color:var(--t3);margin-top:6px;line-height:1.65;max-width:500px}
+.hero-badges{display:flex;gap:5px;flex-wrap:wrap;margin-top:10px}
+.hbadge{font-size:9px;padding:3px 9px;border-radius:99px;font-weight:500;border:.5px solid transparent}
+.hbadge.g{background:var(--gold-dim);color:var(--gold);border-color:var(--gold-border)}
+.hbadge.gr{background:rgba(201,240,110,.08);color:var(--green);border-color:rgba(201,240,110,.2)}
+.hbadge.b{background:rgba(110,175,240,.08);color:var(--blue);border-color:rgba(110,175,240,.2)}
+
+/* CMD BAR */
+.cmd-wrap{padding:14px 16px;border-bottom:1px solid var(--b1);background:var(--bg)}
+.cmd-label{font-size:9px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.cmd-label::before{content:'⌘';color:var(--gold);font-size:11px}
+.cmd-row{display:flex;gap:8px;align-items:center}
+.cmd-input{flex:1;height:42px;background:var(--s2);border:.5px solid var(--b2);border-radius:11px;color:var(--t1);font-family:'DM Sans',sans-serif;font-size:13px;padding:0 14px 0 38px;outline:none;transition:border-color .2s;background-image:url("data:image/svg+xml,%3Csvg width='16' height='16' fill='none' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='11' cy='11' r='7' stroke='%234a4845' stroke-width='1.5'/%3E%3Cpath d='m20 20-3-3' stroke='%234a4845' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:12px center}
+.cmd-input:focus{border-color:var(--gold-border)}
+.cmd-input::placeholder{color:var(--t3)}
+.cmd-btn{height:42px;padding:0 18px;background:var(--gold2);color:#fff;border:none;border-radius:11px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:opacity .15s;flex-shrink:0}
+.cmd-btn:hover{opacity:.88}
+.cmd-btn:disabled{opacity:.4;cursor:not-allowed}
+.cmd-chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.cmd-chip{font-size:10px;padding:4px 10px;border-radius:99px;border:.5px solid var(--b2);background:var(--s2);color:var(--t3);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;white-space:nowrap}
+.cmd-chip:hover{color:var(--gold);border-color:var(--gold-border)}
+
+/* CMD RESULT */
+.cmd-result{margin:10px 0 0;background:var(--s1);border:.5px solid var(--b2);border-radius:14px;overflow:hidden;animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.cmd-result-hdr{padding:9px 13px;border-bottom:.5px solid var(--b1);font-size:10px;color:var(--t3);font-family:'Courier Prime',monospace;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.cmd-step{font-size:9px;padding:2px 8px;border-radius:99px;background:var(--s2);border:.5px solid var(--b2);color:var(--t3);display:inline-flex;align-items:center;gap:4px}
+.cmd-step.active{border-color:var(--gold-border);background:var(--gold-dim);color:var(--gold)}
+.cmd-step.done{border-color:rgba(201,240,110,.2);background:rgba(201,240,110,.06);color:var(--green)}
+.cmd-result-body{padding:12px 13px;font-size:13px;color:var(--t2);line-height:1.85;white-space:pre-wrap;max-height:280px;overflow-y:auto}
+
+/* MORNING BRIEF */
+.brief-wrap{margin:14px 16px 0;background:var(--s1);border:.5px solid var(--gold-border);border-radius:16px;overflow:hidden}
+.brief-hdr{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:.5px solid var(--b1)}
+.brief-hdr-left{display:flex;align-items:center;gap:8px}
+.brief-ico{width:30px;height:30px;border-radius:8px;background:var(--gold-dim);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.brief-title{font-size:12px;font-weight:600;color:var(--t1)}
+.brief-sub{font-size:10px;color:var(--t3);margin-top:1px}
+.brief-btn{font-size:10px;padding:5px 12px;border-radius:99px;border:.5px solid var(--gold-border);background:var(--gold-dim);color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;white-space:nowrap}
+.brief-btn:disabled{opacity:.4;cursor:not-allowed}
+.brief-body{padding:13px 14px;font-size:13px;color:var(--t2);line-height:1.85;min-height:60px}
+.brief-empty{color:var(--t3);font-size:12px;font-style:italic}
+.brief-sources{display:flex;gap:5px;flex-wrap:wrap;padding:8px 14px;border-top:.5px solid var(--b1)}
+.brief-src{font-size:9px;padding:2px 8px;border-radius:99px;background:var(--s2);border:.5px solid var(--b1);color:var(--t3)}
+.brief-src.live{border-color:var(--gold-border);color:var(--gold);background:var(--gold-dim)}
+.brief-src.demo{border-color:var(--b2);color:var(--t3)}
+
+/* SEC */
+.sec{font-size:9px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);padding:0 16px;margin:16px 0 10px;display:flex;align-items:center;gap:8px}
+.sec::after{content:'';flex:1;height:.5px;background:var(--b1)}
+
+/* AGENT GRID */
+.agent-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px}
+.atile{background:var(--s1);border:.5px solid var(--b1);border-radius:16px;overflow:hidden;cursor:pointer;transition:all .2s;animation:fadeUp .4s ease both;text-decoration:none;display:block;color:inherit}
+.atile:hover{border-color:var(--b2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.atile-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 13px 0}
+.atile-ico{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.atile-status{font-size:8px;padding:2px 7px;border-radius:99px;font-weight:700;letter-spacing:.04em}
+.s-live{background:rgba(110,240,212,.1);color:var(--teal);border:.5px solid rgba(110,240,212,.25)}
+.s-search{background:rgba(201,240,110,.1);color:var(--green);border:.5px solid rgba(201,240,110,.25)}
+.s-memory{background:rgba(196,110,240,.1);color:var(--purple);border:.5px solid rgba(196,110,240,.25)}
+.s-agent{background:rgba(110,175,240,.1);color:var(--blue);border:.5px solid rgba(110,175,240,.25)}
+.s-demo{background:rgba(240,165,110,.1);color:var(--orange);border:.5px solid rgba(240,165,110,.25)}
+.atile-body{padding:10px 13px 12px}
+.atile-lbl{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:3px}
+.atile-name{font-family:'DM Serif Display',serif;font-size:18px;line-height:1.1;margin-bottom:4px}
+.atile-sub{font-size:11px;color:var(--t2);line-height:1.5;margin-bottom:9px}
+.atile-signals{display:flex;flex-direction:column;gap:4px;background:var(--s2);border-radius:9px;padding:8px 10px;min-height:44px}
+.sig-row{display:flex;align-items:flex-start;gap:6px}
+.sig-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.sig-text{font-size:10px;color:var(--t2);line-height:1.5}
+.sig-loading{font-size:10px;color:var(--t3);font-style:italic}
+.atile-footer{display:flex;align-items:center;justify-content:space-between;padding:8px 13px;border-top:.5px solid var(--b1);font-size:10px;color:var(--t3)}
+.atile-footer-arrow{transition:transform .15s}
+.atile:hover .atile-footer-arrow{transform:translateX(3px);color:var(--t1)}
+
+/* STACK */
+.stack-wrap{margin:0 16px;background:var(--s1);border:.5px solid var(--b1);border-radius:16px;overflow:hidden}
+.stack-hdr{padding:11px 14px;border-bottom:.5px solid var(--b1);font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--t3)}
+.stack-row{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-bottom:.5px solid var(--b1)}
+.stack-row:last-child{border-bottom:none}
+.stack-key{font-size:12px;color:var(--t2);display:flex;align-items:center;gap:8px}
+.stack-val{font-family:'Courier Prime',monospace;font-size:11px;color:var(--t3)}
+
+/* TYPING */
+.typing-dots{display:inline-flex;gap:3px;align-items:center}
+.typing-dots span{width:5px;height:5px;border-radius:50%;background:var(--t3);animation:dot 1.2s ease-in-out infinite}
+.typing-dots span:nth-child(2){animation-delay:.2s}.typing-dots span:nth-child(3){animation-delay:.4s}
+@keyframes dot{0%,80%,100%{transform:scale(.7);opacity:.4}40%{transform:scale(1);opacity:1}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{display:inline-block;width:10px;height:10px;border:1.5px solid var(--b2);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--s2);border:.5px solid var(--b3);border-radius:12px;padding:10px 18px;font-size:12px;color:var(--t1);opacity:0;transition:all .3s;z-index:999;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+hr{border:none;border-top:.5px solid var(--b1);margin:24px 16px}
+.footer{text-align:center;padding:14px 20px 0;font-size:11px;color:var(--t3);line-height:2}
+.footer a{color:var(--t3);text-decoration:none}
+[data-theme="light"] .atile,[data-theme="light"] .brief-wrap,[data-theme="light"] .stack-wrap,[data-theme="light"] .cmd-result{background:#fff}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="apex-logo">Apex — <em>Mission Control</em></div>
+    <div class="live-pill"><span class="ldot"></span><span id="pillText">LOADING</span></div>
+  </div>
+  <div class="topbar-right">
+    <a class="nav-back" href="index.html">← Miten.co.nz</a>
+    <div class="time-badge" id="timeBadge">—</div>
+    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
+  </div>
+</div>
+
+<div class="hero">
+  <h1>Apex —<br><em>Mission Control</em></h1>
+  <div class="hero-sub">Central dashboard across all agents. Reads live data from Forge and Cortex on load, triggers web searches when relevant, and synthesises across the full stack. InboxIQ and CapitalLens use demo data — connecting personal accounts to a public site would be a privacy risk.</div>
+  <div class="hero-badges">
+    <span class="hbadge g">Claude API</span>
+    <span class="hbadge gr">Forge · Cortex live reads</span>
+    <span class="hbadge b">Web Search</span>
+    <span class="hbadge g">Persistent Storage</span>
+  </div>
+</div>
+
+<div class="cmd-wrap">
+  <div class="cmd-label">Command</div>
+  <div class="cmd-row">
+    <input class="cmd-input" id="cmdInput" placeholder="Ask anything… 'what needs my attention', 'what did I save this week', 'tech news today'" onkeydown="cmdKey(event)">
+    <button class="cmd-btn" id="cmdBtn" onclick="runCommand()">Run ↗</button>
+  </div>
+  <div class="cmd-chips">
+    <span class="cmd-chip" onclick="quickCmd('What needs my attention today?')">What needs attention today?</span>
+    <span class="cmd-chip" onclick="quickCmd('Summarise my week across all agents')">Week summary</span>
+    <span class="cmd-chip" onclick="quickCmd('What is my workout today and how is my recent progress?')">Workout & progress</span>
+    <span class="cmd-chip" onclick="quickCmd('What have I saved to Cortex recently?')">Cortex recap</span>
+    <span class="cmd-chip" onclick="quickCmd('What is happening in tech today?')">Tech news today</span>
+  </div>
+  <div id="cmdResult" style="display:none"></div>
+</div>
+
+<div class="brief-wrap">
+  <div class="brief-hdr">
+    <div class="brief-hdr-left">
+      <div class="brief-ico">☀️</div>
+      <div>
+        <div class="brief-title">Morning Brief</div>
+        <div class="brief-sub" id="briefDate">—</div>
+      </div>
+    </div>
+    <button class="brief-btn" id="briefBtn" onclick="generateBrief()">Generate ✦</button>
+  </div>
+  <div class="brief-body" id="briefBody">
+    <span class="brief-empty">Generating your daily brief…</span>
+  </div>
+  <div class="brief-sources" id="briefSources" style="display:none"></div>
+</div>
+
+<div class="sec">Your agents</div>
+<div class="agent-grid" id="agentGrid"></div>
+
+<div class="sec">Stack</div>
+<div class="stack-wrap">
+  <div class="stack-hdr">Technology</div>
+  <div class="stack-row"><div class="stack-key"><span>🤖</span>Model</div><div class="stack-val">claude-sonnet-4-5</div></div>
+  <div class="stack-row"><div class="stack-key"><span>🌐</span>API routing</div><div class="stack-val">Cloudflare Worker</div></div>
+  <div class="stack-row"><div class="stack-key"><span>📬</span>Gmail integration</div><div class="stack-val">Gmail MCP · built for Claude</div></div>
+  <div class="stack-row"><div class="stack-key"><span>💾</span>Live reads</div><div class="stack-val">Forge log · Cortex brain</div></div>
+  <div class="stack-row"><div class="stack-key"><span>🔍</span>Live search</div><div class="stack-val">web_search_20250305</div></div>
+  <div class="stack-row"><div class="stack-key"><span>🧱</span>Frontend</div><div class="stack-val">Vanilla HTML · CSS · JS</div></div>
+</div>
+
+<hr>
+<div class="footer">
+  Apex · Mission Control · Built by Miten Chauhan<br>
+  <span style="color:var(--gold)">◈</span> 6 AI projects · Claude API · Wellington, NZ · <a href="index.html">miten.co.nz</a>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const API_URL = 'https://nexus-api.mitenchauhan08.workers.dev';
+
+// ── DEMO SNAPSHOTS (clearly marked — portfolio privacy) ──
+const INBOXIQ_DEMO = {
+  label: 'InboxIQ (demo — portfolio privacy)',
+  data: '3 priority emails: IRD tax assessment ready (action required), ANZ low balance alert $42 (urgent), Seek 3 new job matches — Network Security Engineer WLG $110–135K (worth reviewing). Also: Westpac rent DD $1,800 due today, Spark password expires in 3 days, One NZ bill $89 due 30 May.'
+};
+const CAPITALLENS_DEMO = {
+  label: 'CapitalLens (demo — portfolio privacy)',
+  data: 'Monthly surplus $2,380. House deposit $92,800/$120K (77.3%, ~14 months to go). KiwiSaver $34,200. Upcoming: Spotify $16.99 due 3 days, Power $142 due 6 days. Net worth ~$82,800.'
+};
+
+// ── LIVE DATA READERS ──
+async function readCortex() {
+  try {
+    const r = await window.storage.get('cortex_brain_v1');
+    if (!r) return { count: 0, recent: [], tags: [], raw: 'No memories saved yet.' };
+    const brain = JSON.parse(r.value);
+    const tags = [...new Set(brain.flatMap(n => n.tags || []))].slice(0, 8);
+    const recent = brain.slice(0, 5).map(n => `- [${n.type}] ${n.summary}`);
+    return {
+      count: brain.length,
+      recent,
+      tags,
+      raw: brain.length
+        ? `${brain.length} memories. Recent: ${recent.join(' | ')}. Topics: ${tags.join(', ')}.`
+        : 'No memories saved yet.'
+    };
+  } catch { return { count: 0, recent: [], tags: [], raw: 'Could not read Cortex.' }; }
+}
+
+async function readForge() {
+  const WORKOUTS = {
+    2:{label:'Push',sub:'Chest / Shoulders / Triceps'},
+    4:{label:'Pull',sub:'Back / Biceps'},
+    6:{label:'Legs',sub:'Quads / Hamstrings / Calves'},
+    0:{label:'Upper',sub:'Balanced Push & Pull'}
+  };
+  const dow = new Date().getDay();
+  const todayWO = WORKOUTS[dow];
+  const scheduledToday = todayWO
+    ? `Scheduled today: ${todayWO.label} day (${todayWO.sub}).`
+    : 'Rest day today — recovery and mobility.';
+
+  try {
+    const r = await window.storage.get('forge_log_v1');
+    if (!r) return { sessions: 0, raw: `${scheduledToday} No sessions logged yet — log workouts on the Forge page.` };
+    const log = JSON.parse(r.value);
+    const entries = Object.values(log).sort((a, b) => new Date(b.date) - new Date(a.date));
+    if (!entries.length) return { sessions: 0, raw: `${scheduledToday} No sessions logged yet.` };
+
+    const todayKey = todayWO ? `${todayWO.label.toUpperCase()}_${new Date().toDateString()}` : null;
+    const todayLog = todayKey ? log[todayKey] : null;
+    const todayProgress = todayLog
+      ? `Today's ${todayWO.label} session: ${todayLog.exercises.filter(e=>e.done).length}/${todayLog.exercises.length} exercises done.`
+      : scheduledToday;
+
+    const recent3 = entries.slice(0, 3).map(e => {
+      const pct = e.exercises.length ? Math.round(e.exercises.filter(x=>x.done).length/e.exercises.length*100) : 0;
+      const kgs = e.exercises.filter(x=>x.kg).map(x=>x.kg+'kg').slice(0,2).join(', ');
+      return `${e.day} (${e.date}): ${pct}% complete${kgs ? ' · '+kgs : ''}`;
+    });
+
+    return {
+      sessions: entries.length,
+      todayProgress,
+      recent: recent3,
+      raw: `${entries.length} sessions logged. ${todayProgress} Recent: ${recent3.join(' | ')}.`
+    };
+  } catch { return { sessions: 0, raw: `${scheduledToday} Could not read session log.` }; }
+}
+
+// ── ORCHESTRATOR: decide which agents are relevant to a query ──
+function routeQuery(query) {
+  const routes = {
+    forge: /workout|exercise|gym|push|pull|legs|upper|session|training|progress|weight|sets|reps|ppl|forge/i.test(query),
+    cortex: /save|saved|remember|memory|memories|note|idea|brain|cortex|knowledge|what did i/i.test(query),
+    techbrief: /tech|news|ai|cyber|security|dev|latest|today|happening|update|story/i.test(query),
+    inboxiq: /email|inbox|mail|urgent|message|ird|anz|seek|bill|rent|spark/i.test(query),
+    capitallens: /money|finance|financial|deposit|kiwisaver|budget|salary|surplus|spend|mortgage|rate/i.test(query),
+    threatlens: /threat|cve|ip|domain|malware|hack|breach|vulnerability|ioc|attack|actor/i.test(query),
+  };
+  const anyMatch = Object.values(routes).some(Boolean);
+  if (!anyMatch) return { forge: true, cortex: true, techbrief: true, inboxiq: true, capitallens: true, threatlens: false };
+  return routes;
+}
+
+// ── COMMAND BAR ──
+function cmdKey(e) { if (e.key === 'Enter') runCommand(); }
+function quickCmd(msg) { document.getElementById('cmdInput').value = msg; runCommand(); }
+
+async function runCommand() {
+  const input = document.getElementById('cmdInput');
+  const query = input.value.trim();
+  if (!query) return;
+
+  const btn = document.getElementById('cmdBtn');
+  btn.disabled = true; btn.textContent = '…';
+
+  const resultWrap = document.getElementById('cmdResult');
+  resultWrap.style.display = 'block';
+
+  // Figure out which agents to query
+  const routes = routeQuery(query);
+  const steps = [];
+  if (routes.forge) steps.push({ id: 'forge', label: '💪 Forge', fn: readForge });
+  if (routes.cortex) steps.push({ id: 'cortex', label: '🧠 Cortex', fn: readCortex });
+  if (routes.techbrief) steps.push({ id: 'techbrief', label: '📰 TechBrief', fn: async () => '(will search live)' });
+  if (routes.inboxiq) steps.push({ id: 'inboxiq', label: '📬 InboxIQ (demo)', fn: async () => INBOXIQ_DEMO.data });
+  if (routes.capitallens) steps.push({ id: 'cap', label: '📊 CapitalLens (demo)', fn: async () => CAPITALLENS_DEMO.data });
+  if (routes.threatlens) steps.push({ id: 'threatlens', label: '🛡 ThreatLens', fn: async () => 'ThreatLens is on-demand — open the ThreatLens page to submit an IP, domain or CVE for analysis.' });
+
+  // Render step indicators
+  function renderSteps(activeId) {
+    return steps.map(s => {
+      const cls = s._done ? 'done' : s.id === activeId ? 'active' : '';
+      const ico = s._done ? '✓ ' : s.id === activeId ? '<span class="spinner"></span> ' : '';
+      return `<span class="cmd-step ${cls}">${ico}${s.label}</span>`;
+    }).join('');
+  }
+
+  resultWrap.innerHTML = `<div class="cmd-result">
+    <div class="cmd-result-hdr" id="cmdSteps"><span style="color:var(--gold)">◈</span> querying agents… ${renderSteps(steps[0]?.id)}</div>
+    <div class="cmd-result-body"><div class="typing-dots"><span></span><span></span><span></span></div></div>
+  </div>`;
+
+  // Query each relevant agent
+  const gathered = {};
+  for (const step of steps) {
+    document.getElementById('cmdSteps').innerHTML = `<span style="color:var(--gold)">◈</span> querying agents… ${renderSteps(step.id)}`;
+    try { gathered[step.id] = await step.fn(); } catch { gathered[step.id] = 'unavailable'; }
+    step._done = true;
+  }
+
+  document.getElementById('cmdSteps').innerHTML = `<span style="color:var(--gold)">◈</span> synthesising… ${renderSteps(null)}`;
+
+  // Build context from real gathered data
+  const contextParts = [];
+  if (gathered.forge) contextParts.push(`FORGE (live): ${typeof gathered.forge === 'object' ? gathered.forge.raw : gathered.forge}`);
+  if (gathered.cortex) contextParts.push(`CORTEX (live): ${typeof gathered.cortex === 'object' ? gathered.cortex.raw : gathered.cortex}`);
+  if (gathered.techbrief) contextParts.push(`TECHBRIEF (live search): ${gathered.techbrief || 'No results'}`);
+  if (gathered.inboxiq) contextParts.push(`INBOXIQ (demo — portfolio privacy): ${gathered.inboxiq}`);
+  if (gathered.cap) contextParts.push(`CAPITALLENS (demo — portfolio privacy): ${gathered.cap}`);
+  if (gathered.threatlens) contextParts.push(`THREATLENS: ${gathered.threatlens}`);
+
+  const sys = `You are Apex, Miten's personal AI chief of staff. Answer using ONLY the agent data below — never invent, fabricate or speculate beyond it. If an agent shows "No sessions logged yet" or similar, just say that honestly — do not suggest the agent is offline or ask follow-up questions. Be sharp and direct. Under 150 words.
+
+AGENT DATA:
+${contextParts.join('\n\n')}`;
+
+  const apiBody = {
+    model: 'claude-sonnet-4-5', max_tokens: 400,
+    system: sys,
+    messages: [{ role: 'user', content: query }]
+  };
+  if (routes.techbrief) apiBody.tools = [{ type: 'web_search_20250305', name: 'web_search' }];
+
+  try {
+    const resp = await fetch(API_URL, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(apiBody)
+    });
+    const data = await resp.json();
+    const text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('') || 'No response.';
+    resultWrap.querySelector('.cmd-result-body').textContent = text;
+    document.getElementById('cmdSteps').innerHTML = `<span style="color:var(--gold)">◈</span> done — ${steps.map(s => `<span class="cmd-step done">✓ ${s.label}</span>`).join('')}`;
+  } catch {
+    resultWrap.querySelector('.cmd-result-body').textContent = 'Could not reach API. Check your Cloudflare Worker.';
+  }
+
+  btn.disabled = false; btn.textContent = 'Run ↗';
+  input.value = '';
+  resultWrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ── MORNING BRIEF ──
+async function generateBrief(preloadedForge, preloadedCortex) {
+  const btn = document.getElementById('briefBtn');
+  const body = document.getElementById('briefBody');
+  const sources = document.getElementById('briefSources');
+  btn.disabled = true; btn.textContent = '…';
+  body.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+  sources.style.display = 'none';
+
+  // Step 1 — read local storage first (fast, no API)
+  const [forge, cortex] = await Promise.all([
+    preloadedForge ? Promise.resolve(preloadedForge) : readForge(),
+    preloadedCortex ? Promise.resolve(preloadedCortex) : readCortex()
+  ]);
+
+  // Step 2 — fetch tech story separately (sequential to avoid rate limit)
+  let techStory = '';
+  try {
+    const tr = await fetch(API_URL, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5', max_tokens: 150,
+        system: 'Search for the top tech or AI story today. One sentence only — headline and why it matters. Plain text.',
+        messages: [{ role: 'user', content: 'Top tech story today' }],
+        tools: [{ type: 'web_search_20250305', name: 'web_search' }]
+      })
+    });
+    if (tr.ok) {
+      const td = await tr.json();
+      if (!td.error) {
+        techStory = (td.content || []).filter(b => b.type === 'text').map(b => b.text).join('').trim();
+      }
+    }
+  } catch { techStory = ''; }
+
+  // Small gap between API calls to avoid rate limit
+  await new Promise(r => setTimeout(r, 3000));
+
+  // Step 2 — synthesise into brief
+  const now = new Date();
+  const dayName = now.toLocaleDateString('en-NZ', { weekday: 'long', day: 'numeric', month: 'long' });
+
+  const ctx = `Today: ${dayName}.
+
+INBOXIQ (demo emails): ${INBOXIQ_DEMO.data}
+FORGE (live workout): ${forge.raw}
+TECHBRIEF (live search): ${techStory || 'No tech story today.'}
+CORTEX (live memories): ${cortex.raw}`;
+
+  try {
+    const resp = await fetch(API_URL, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5', max_tokens: 550,
+        system: `You are Apex, Miten's personal AI chief of staff. Write a sharp morning brief in 4-5 sentences of plain flowing prose — no bullets, no headers. Cover in order: 1) urgent emails from InboxIQ 2) today's workout from Forge 3) top tech story from TechBrief (skip if none) 4) any Cortex memories (skip if none). Never invent data — if Forge shows no sessions logged, just skip it. Be personal and direct.`,
+        messages: [{ role: 'user', content: ctx }]
+      })
+    });
+
+    if (!resp.ok) {
+      body.textContent = `API error ${resp.status} — check your Cloudflare Worker.`;
+      btn.disabled = false; btn.textContent = 'Regenerate ✦';
+      return;
+    }
+
+    const data = await resp.json();
+    if (data.error) {
+      body.innerHTML = `
+        <span style="color:var(--t3);font-size:12px">Rate limit hit — please wait 30 seconds and try again.</span>
+        <button onclick="generateBrief()" style="display:block;margin-top:10px;padding:7px 16px;border-radius:8px;border:.5px solid var(--gold-border);background:var(--gold-dim);color:var(--gold);font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">Retry ↻</button>
+      `;
+      btn.disabled = false; btn.textContent = 'Regenerate ✦';
+      return;
+    }
+
+    const text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('').trim();
+    if (!text) {
+      body.textContent = 'Brief returned empty — try regenerating.';
+      btn.disabled = false; btn.textContent = 'Regenerate ✦';
+      return;
+    }
+
+    body.textContent = text;
+    sources.style.display = 'flex';
+    sources.innerHTML = [
+      `<span class="brief-src demo">📬 InboxIQ — demo</span>`,
+      `<span class="brief-src live">💪 Forge — live</span>`,
+      techStory ? `<span class="brief-src live">📰 TechBrief — live</span>` : `<span class="brief-src demo">📰 TechBrief — unavailable</span>`,
+      `<span class="brief-src live">🧠 Cortex — live (${cortex.count} memories)</span>`,
+    ].join('');
+
+  } catch(err) {
+    console.error('Brief error:', err);
+    body.innerHTML = `
+      <span style="color:var(--t3);font-size:12px">Could not load brief — network may not have been ready.</span>
+      <button onclick="generateBrief()" style="display:block;margin-top:10px;padding:7px 16px;border-radius:8px;border:.5px solid var(--gold-border);background:var(--gold-dim);color:var(--gold);font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">Retry ↻</button>
+    `;
+  }
+
+  btn.disabled = false; btn.textContent = 'Regenerate ✦';
+}
+
+// ── RENDER TILES with live data ──
+const AGENT_DEFS = [
+  { id:'inboxiq', name:'InboxIQ', lbl:'Gmail Agent', icon:'📬', href:'inboxiq.html',
+    icoStyle:'background:rgba(91,143,249,.12);color:#5b8ff9', status:'s-agent', statusLabel:'MCP AGENT',
+    sub:'Gmail MCP agent — demo inbox for portfolio', accent:'#5b8ff9', live: false },
+  { id:'threatlens', name:'ThreatLens', lbl:'Cyber Intel', icon:'🛡', href:'threatlens.html',
+    icoStyle:'background:rgba(110,240,212,.12);color:#6ef0d4', status:'s-live', statusLabel:'LIVE',
+    sub:'IP · Domain · CVE · Threat Actor', accent:'#6ef0d4', live: true },
+  { id:'techbrief', name:'TechBrief', lbl:'Daily Intel', icon:'📰', href:'techbrief.html',
+    icoStyle:'background:rgba(91,143,249,.1);color:#60a5fa', status:'s-search', statusLabel:'WEB SEARCH',
+    sub:'AI · Cyber · Dev · NZ Tech', accent:'#60a5fa', live: true },
+  { id:'cortex', name:'Cortex', lbl:'Second Brain', icon:'🧠', href:'cortex.html',
+    icoStyle:'background:rgba(196,110,240,.12);color:#c46ef0', status:'s-memory', statusLabel:'LIVE STORAGE',
+    sub:'Save ideas · Auto-tag · Chat', accent:'#c46ef0', live: true },
+  { id:'forge', name:'Forge', lbl:'Workout Coach', icon:'💪', href:'forge.html',
+    icoStyle:'background:rgba(255,140,48,.12);color:#ff8c30', status:'s-search', statusLabel:'LIVE STORAGE',
+    sub:'PPL programme · Session log', accent:'#ff8c30', live: true },
+  { id:'capitallens', name:'CapitalLens', lbl:'NZ Finance', icon:'📊', href:'capitallens.html',
+    icoStyle:'background:rgba(240,184,48,.12);color:#f0b830', status:'s-demo', statusLabel:'DEMO DATA',
+    sub:'Live NZ rates · Demo profile', accent:'#f0b830', live: false },
+];
+
+function renderTiles(forgeData, cortexData) {
+  const grid = document.getElementById('agentGrid');
+  grid.innerHTML = AGENT_DEFS.map((a, i) => {
+    let sigs = [];
+
+    if (a.id === 'forge') {
+      sigs = forgeData.sessions > 0
+        ? [forgeData.todayProgress, `${forgeData.sessions} sessions logged`]
+        : ['No sessions logged yet', 'Start logging on the Today tab'];
+    } else if (a.id === 'cortex') {
+      sigs = cortexData.count > 0
+        ? [`${cortexData.count} memories saved`, cortexData.tags.slice(0,3).join(' · ') || 'No tags yet']
+        : ['No memories saved yet', 'Drop your first note in Cortex'];
+    } else if (a.id === 'inboxiq') {
+      sigs = ['3 priority emails (demo)', 'IRD · ANZ · Seek alerts'];
+    } else if (a.id === 'threatlens') {
+      sigs = ['Submit any IOC for analysis', 'Advisor-grade intel briefs'];
+    } else if (a.id === 'techbrief') {
+      sigs = ['Auto-runs on open', '4 live research chains daily'];
+    } else if (a.id === 'capitallens') {
+      sigs = ['Live NZ mortgage & OCR data', 'Demo profile · health score 72/100'];
+    }
+
+    const sigsHTML = sigs.map(s => `
+      <div class="sig-row">
+        <div class="sig-dot" style="background:${a.accent}"></div>
+        <div class="sig-text">${s}</div>
+      </div>`).join('');
+
+    return `<a class="atile" href="${a.href}" style="animation-delay:${i*0.07}s">
+      <div class="atile-hdr">
+        <div class="atile-ico" style="${a.icoStyle}">${a.icon}</div>
+        <span class="atile-status ${a.status}">${a.statusLabel}</span>
+      </div>
+      <div class="atile-body">
+        <div class="atile-lbl">${a.lbl}</div>
+        <div class="atile-name">${a.name}</div>
+        <div class="atile-sub">${a.sub}</div>
+        <div class="atile-signals">${sigsHTML}</div>
+      </div>
+      <div class="atile-footer">
+        <span>Open ${a.name}</span>
+        <span class="atile-footer-arrow">→</span>
+      </div>
+    </a>`;
+  }).join('');
+}
+
+// ── TIME ──
+function updateTime() {
+  const now = new Date();
+  document.getElementById('timeBadge').textContent = now.toLocaleTimeString('en-NZ', { hour:'2-digit', minute:'2-digit' });
+  document.getElementById('briefDate').textContent = now.toLocaleDateString('en-NZ', { weekday:'long', day:'numeric', month:'long' });
+}
+
+// ── THEME ──
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('themeBtn').textContent = isDark ? '☀️' : '🌙';
+  localStorage.setItem('theme', isDark ? 'light' : 'dark');
+}
+function initTheme() {
+  const saved = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+  document.getElementById('themeBtn').textContent = saved === 'dark' ? '🌙' : '☀️';
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ── INIT — read live data on load, render tiles ──
+async function init() {
+  initTheme();
+  updateTime();
+  setInterval(updateTime, 30000);
+
+  // Show loading tiles first
+  document.getElementById('pillText').textContent = 'LOADING…';
+  const grid = document.getElementById('agentGrid');
+  grid.innerHTML = AGENT_DEFS.map((a,i) => `
+    <a class="atile" href="${a.href}" style="animation-delay:${i*0.07}s">
+      <div class="atile-hdr"><div class="atile-ico" style="${a.icoStyle}">${a.icon}</div><span class="atile-status ${a.status}">${a.statusLabel}</span></div>
+      <div class="atile-body">
+        <div class="atile-lbl">${a.lbl}</div>
+        <div class="atile-name">${a.name}</div>
+        <div class="atile-sub">${a.sub}</div>
+        <div class="atile-signals"><div class="sig-loading"><span class="spinner"></span> reading…</div></div>
+      </div>
+      <div class="atile-footer"><span>Open ${a.name}</span><span class="atile-footer-arrow">→</span></div>
+    </a>`).join('');
+
+  // Read live data in parallel
+  const [forgeData, cortexData] = await Promise.all([readForge(), readCortex()]);
+
+  // Re-render tiles with real data
+  renderTiles(forgeData, cortexData);
+  document.getElementById('pillText').textContent = '6 AGENTS';
+
+  // Auto-generate brief after tiles settle
+  // Delay gives mobile browsers time to finish rendering before hitting the API
+  // On retry failure the user can always hit Regenerate
+  const briefDelay = /Mobi|Android|iPhone/i.test(navigator.userAgent) ? 3000 : 1500;
+  setTimeout(() => generateBrief(forgeData, cortexData), briefDelay);
+}
+
+init();
+</script>
+</body>
+</html>

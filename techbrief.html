@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="description" content="TechBrief — Miten's autonomous daily tech intelligence agent. AI, Cybersecurity, Dev Tools, NZ Tech — live every day.">
+<title>TechBrief — Daily Tech Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+
+[data-theme="dark"]{
+  --bg:#08080d;--s1:#0e0e15;--s2:#13131c;--s3:#1a1a24;--s4:#22222e;
+  --b1:rgba(255,255,255,.05);--b2:rgba(255,255,255,.09);--b3:rgba(255,255,255,.14);
+  --t1:#f0eeea;--t2:#9a9895;--t3:#4a4845;
+  --blue:#5b9cf6;--blue2:#3b82f6;--blue-dim:rgba(91,156,246,.1);--blue-border:rgba(91,156,246,.22);
+  --green:#6ee87a;--teal:#6ef0d4;--purple:#c46ef0;--orange:#f0a56e;--red:#f06e6e;--gold:#f0c46e;
+  --nav-bg:rgba(8,8,13,.92);
+}
+[data-theme="light"]{
+  --bg:#f0f2f8;--s1:#fff;--s2:#eef0f8;--s3:#e4e6f0;--s4:#d8daea;
+  --b1:rgba(0,0,0,.06);--b2:rgba(0,0,0,.11);--b3:rgba(0,0,0,.16);
+  --t1:#14141e;--t2:#55556a;--t3:#9090aa;
+  --blue:#2563eb;--blue2:#1d4ed8;--blue-dim:rgba(37,99,235,.08);--blue-border:rgba(37,99,235,.2);
+  --green:#15803d;--teal:#0f766e;--purple:#6b3fa0;--orange:#b35c00;--red:#b03030;--gold:#9a6400;
+  --nav-bg:rgba(240,242,248,.92);
+}
+
+html,body{min-height:100%;background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;transition:background .25s,color .25s}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--b3);border-radius:3px}
+.app{max-width:700px;margin:0 auto;padding:0 0 80px}
+
+/* ── NAV ── */
+.nav{display:flex;justify-content:space-between;align-items:center;padding:11px 16px;border-bottom:1px solid var(--b1);background:var(--nav-bg);backdrop-filter:blur(14px);position:sticky;top:0;z-index:300;transition:background .25s}
+.nav-left{display:flex;align-items:center;gap:10px}
+.nav-title{font-family:'DM Serif Display',serif;font-size:16px;letter-spacing:-.2px}
+.nav-title em{color:var(--blue);font-style:italic}
+.live-pill{display:inline-flex;align-items:center;gap:5px;font-family:'Courier Prime',monospace;font-size:9px;color:var(--t3);background:var(--s2);border:.5px solid var(--b2);padding:3px 9px;border-radius:99px}
+.ldot{width:5px;height:5px;border-radius:50%;background:var(--blue);animation:glow 2s infinite;flex-shrink:0}
+@keyframes glow{0%,100%{opacity:.3}50%{opacity:1}}
+.nav-right{display:flex;gap:6px;align-items:center}
+.nav-back{font-size:11px;color:var(--t3);text-decoration:none;padding:5px 10px;border-radius:6px;border:1px solid var(--b1);background:var(--s2);transition:all .15s}
+.nav-back:hover{color:var(--t1)}
+.theme-btn{width:30px;height:30px;border-radius:7px;border:1px solid var(--b1);background:var(--s2);color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .15s}
+.theme-btn:hover{border-color:var(--blue);color:var(--blue)}
+
+/* ── HERO ── */
+.hero{padding:22px 16px 18px;border-bottom:1px solid var(--b1)}
+.hero-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.hero h1{font-family:'DM Serif Display',serif;font-size:28px;font-weight:400;letter-spacing:-.4px;line-height:1.1}
+.hero h1 em{color:var(--blue);font-style:italic}
+.hero-sub{font-size:12px;color:var(--t3);margin-top:6px;line-height:1.6}
+.hero-meta{display:flex;align-items:center;gap:6px;margin-top:10px;flex-wrap:wrap}
+.hbadge{font-size:9px;padding:3px 9px;border-radius:99px;font-weight:500;border:.5px solid transparent}
+.hbadge.b{background:var(--blue-dim);color:var(--blue);border-color:var(--blue-border)}
+.hbadge.g{background:rgba(110,232,122,.1);color:var(--green);border-color:rgba(110,232,122,.2)}
+.hbadge.t{background:rgba(110,240,212,.1);color:var(--teal);border-color:rgba(110,240,212,.2)}
+.hbadge.o{background:rgba(240,165,110,.1);color:var(--orange);border-color:rgba(240,165,110,.2)}
+.date-badge{font-family:'Courier Prime',monospace;font-size:11px;color:var(--t2);background:var(--s2);border:.5px solid var(--b2);padding:6px 12px;border-radius:8px;white-space:nowrap;flex-shrink:0}
+
+/* ── LOADING STATE ── */
+.loading-wrap{padding:40px 16px;text-align:center}
+.loading-title{font-family:'DM Serif Display',serif;font-size:18px;color:var(--t1);margin-bottom:8px}
+.loading-sub{font-size:12px;color:var(--t3);margin-bottom:24px;line-height:1.7}
+.loading-steps{display:flex;flex-direction:column;gap:6px;max-width:300px;margin:0 auto}
+.lstep{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;background:var(--s1);border:.5px solid var(--b1);font-size:11px;color:var(--t3);text-align:left;transition:all .4s}
+.lstep.active{border-color:var(--blue-border);background:var(--blue-dim);color:var(--t1)}
+.lstep.done{border-color:rgba(110,232,122,.2);background:rgba(110,232,122,.06);color:var(--green)}
+.lstep-ico{width:20px;height:20px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{display:inline-block;width:12px;height:12px;border:1.5px solid var(--b2);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite}
+
+/* ── CATEGORY FILTER ── */
+.cat-filter{display:flex;gap:5px;padding:12px 16px;overflow-x:auto;-webkit-overflow-scrolling:touch;border-bottom:1px solid var(--b1);background:var(--bg);position:sticky;top:48px;z-index:200;backdrop-filter:blur(14px)}
+.cat-filter::-webkit-scrollbar{display:none}
+.cat-btn{flex-shrink:0;padding:6px 14px;border-radius:99px;border:.5px solid var(--b2);background:var(--s1);color:var(--t3);font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;white-space:nowrap}
+.cat-btn.act{border-color:var(--blue-border);background:var(--blue-dim);color:var(--blue)}
+.cat-btn:hover:not(.act){color:var(--t1);border-color:var(--b3)}
+
+/* ── BRIEF CARDS ── */
+.briefs{display:flex;flex-direction:column;gap:0;padding:0}
+.section-hdr{padding:12px 16px 8px;display:flex;align-items:center;justify-content:space-between}
+.section-title{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);display:flex;align-items:center;gap:7px}
+.section-count{font-size:9px;color:var(--t3);background:var(--s2);border:.5px solid var(--b1);padding:2px 8px;border-radius:99px}
+
+.story-card{margin:0 16px 10px;background:var(--s1);border:.5px solid var(--b1);border-radius:16px;overflow:hidden;animation:fadeUp .4s ease both;transition:border-color .2s}
+.story-card:hover{border-color:var(--b2)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.card-top{padding:13px 14px 11px;display:flex;gap:11px;align-items:flex-start}
+.card-cat-ico{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.card-body{flex:1;min-width:0}
+.card-headline{font-size:14px;font-weight:600;color:var(--t1);line-height:1.45;margin-bottom:6px}
+.card-brief{font-size:12px;color:var(--t2);line-height:1.7;margin-bottom:8px}
+.card-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.card-tag{font-size:9px;padding:2px 8px;border-radius:99px;font-weight:600}
+.card-time{font-family:'Courier Prime',monospace;font-size:9px;color:var(--t3)}
+.card-signal{font-size:9px;padding:2px 8px;border-radius:99px;font-weight:600}
+.signal-up{background:rgba(110,232,122,.1);color:var(--green);border:.5px solid rgba(110,232,122,.2)}
+.signal-down{background:rgba(240,110,110,.1);color:var(--red);border:.5px solid rgba(240,110,110,.2)}
+.signal-neutral{background:var(--blue-dim);color:var(--blue);border:.5px solid var(--blue-border)}
+
+/* ── DIVE DEEPER ── */
+.card-actions{display:flex;gap:6px;padding:9px 14px;border-top:.5px solid var(--b1);align-items:center}
+.dive-btn{font-size:11px;padding:5px 13px;border-radius:99px;border:.5px solid var(--blue-border);background:var(--blue-dim);color:var(--blue);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;font-weight:600}
+.dive-btn:hover{opacity:.8}
+.dive-btn:disabled{opacity:.4;cursor:not-allowed}
+.share-btn{font-size:11px;padding:5px 11px;border-radius:99px;border:.5px solid var(--b2);background:transparent;color:var(--t3);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.share-btn:hover{color:var(--t1)}
+.card-expanded{padding:12px 14px;border-top:.5px solid var(--b1);background:var(--s2);font-size:12px;color:var(--t2);line-height:1.8;animation:fadeUp .3s ease}
+.card-expanded .exp-label{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:7px}
+
+/* ── REFRESH BAR ── */
+.refresh-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-top:1px solid var(--b1);border-bottom:1px solid var(--b1);background:var(--s1)}
+.refresh-left{font-size:11px;color:var(--t3);font-family:'Courier Prime',monospace}
+.refresh-btn{font-size:11px;padding:6px 14px;border-radius:99px;border:.5px solid var(--b2);background:var(--s2);color:var(--t2);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;display:flex;align-items:center;gap:5px}
+.refresh-btn:hover{color:var(--t1);border-color:var(--b3)}
+.refresh-btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* ── EMPTY / ERROR ── */
+.empty{text-align:center;padding:48px 20px;color:var(--t3)}
+.empty-ico{font-size:32px;margin-bottom:12px;opacity:.4}
+.empty-title{font-size:14px;font-weight:500;color:var(--t2);margin-bottom:6px}
+.empty-sub{font-size:12px;line-height:1.6}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--s2);border:.5px solid var(--b3);border-radius:12px;padding:10px 18px;font-size:12px;color:var(--t1);opacity:0;transition:all .3s;z-index:999;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── FOOTER ── */
+hr{border:none;border-top:.5px solid var(--b1);margin:24px 16px}
+.footer{text-align:center;padding:14px 20px 0;font-size:11px;color:var(--t3);line-height:2}
+
+/* ── LIGHT OVERRIDES ── */
+[data-theme="light"] .cat-filter{background:rgba(240,242,248,.92)}
+[data-theme="light"] .story-card{background:#fff}
+[data-theme="light"] .card-expanded{background:#eef0f8}
+[data-theme="light"] .refresh-bar{background:#fff}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-left">
+    <div class="nav-title">Tech<em>Brief</em></div>
+    <div class="live-pill"><span class="ldot"></span>LIVE INTEL</div>
+  </div>
+  <div class="nav-right">
+    <a class="nav-back" href="apex.html">← Apex</a>
+    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-top">
+    <div>
+      <h1>Daily Tech —<br><em>Intelligence Brief</em></h1>
+      <div class="hero-sub">Claude autonomously researches today's top stories across AI, Cybersecurity, Dev Tools and NZ Tech — then synthesises each into a sharp, opinionated take.</div>
+      <div class="hero-meta">
+        <span class="hbadge b">Claude API</span>
+        <span class="hbadge b">Web Search</span>
+        <span class="hbadge g">Auto-runs</span>
+        <span class="hbadge t">Agent Chaining</span>
+      </div>
+    </div>
+    <div class="date-badge" id="dateBadge">—</div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div id="mainContent">
+  <!-- Loading state shown initially -->
+  <div class="loading-wrap" id="loadingWrap">
+    <div class="loading-title">Researching today's tech world…</div>
+    <div class="loading-sub">Claude is running 4 live searches<br>and synthesising each into an intelligent brief.</div>
+    <div class="loading-steps" id="loadingSteps"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+</div>
+
+<script>
+const API_URL = 'https://nexus-api.mitenchauhan08.workers.dev';
+
+const CATEGORIES = [
+  {
+    id: 'ai',
+    label: 'AI & LLMs',
+    icon: '🤖',
+    accent: '#5b9cf6',
+    dim: 'rgba(91,156,246,.1)',
+    border: 'rgba(91,156,246,.22)',
+    tagBg: 'rgba(91,156,246,.12)',
+    tagColor: '#5b9cf6',
+    query: 'latest AI and large language model news today 2026 — new models, research breakthroughs, OpenAI Anthropic Google',
+    emoji: '🤖'
+  },
+  {
+    id: 'cyber',
+    label: 'Cybersecurity',
+    icon: '🛡',
+    accent: '#f06e6e',
+    dim: 'rgba(240,110,110,.1)',
+    border: 'rgba(240,110,110,.22)',
+    tagBg: 'rgba(240,110,110,.12)',
+    tagColor: '#f06e6e',
+    query: 'major cybersecurity news today 2026 — breaches, vulnerabilities, ransomware, threat actors, zero days',
+    emoji: '🛡'
+  },
+  {
+    id: 'dev',
+    label: 'Dev & Tools',
+    icon: '⚙️',
+    accent: '#c46ef0',
+    dim: 'rgba(196,110,240,.1)',
+    border: 'rgba(196,110,240,.22)',
+    tagBg: 'rgba(196,110,240,.12)',
+    tagColor: '#c46ef0',
+    query: 'developer tools programming frameworks news today 2026 — new releases, GitHub, open source, VS Code, Cursor',
+    emoji: '⚙️'
+  },
+  {
+    id: 'nz',
+    label: 'NZ Tech',
+    icon: '🇳🇿',
+    accent: '#f0c46e',
+    dim: 'rgba(240,196,110,.1)',
+    border: 'rgba(240,196,110,.22)',
+    tagBg: 'rgba(240,196,110,.12)',
+    tagColor: '#f0c46e',
+    query: 'New Zealand technology news today 2026 — NZ startups, digital economy, tech sector, government tech policy NZ',
+    emoji: '🇳🇿'
+  }
+];
+
+let stories = [];
+let activeFilter = 'all';
+let generatedAt = null;
+
+/* ── THEME ── */
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('themeBtn').textContent = isDark ? '☀️' : '🌙';
+}
+
+/* ── DATE ── */
+function setDate() {
+  const now = new Date();
+  document.getElementById('dateBadge').textContent = now.toLocaleDateString('en-NZ', {
+    weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'
+  });
+}
+
+/* ── LOADING STEPS ── */
+function renderLoadingSteps(activeIdx, statusMsg) {
+  const el = document.getElementById('loadingSteps');
+  if (!el) return;
+  el.innerHTML = CATEGORIES.map((cat, i) => {
+    let cls = '';
+    let ico = `<span style="font-size:12px">${cat.icon}</span>`;
+    if (i < activeIdx) { cls = 'done'; ico = '✓'; }
+    else if (i === activeIdx) {
+      cls = 'active';
+      ico = statusMsg ? '⏳' : '<span class="spinner"></span>';
+    }
+    const label = (i === activeIdx && statusMsg) ? statusMsg : `Searching ${cat.label}…`;
+    return `<div class="lstep ${cls}">
+      <div class="lstep-ico">${ico}</div>
+      <span>${label}</span>
+    </div>`;
+  }).join('');
+}
+
+/* ── FETCH ONE CATEGORY ── */
+async function fetchCategory(cat) {
+  const systemPrompt = `You are TechBrief. Search for the top ${cat.label} story today and respond ONLY with valid JSON (no markdown):
+{"headline":"max 10 words","brief":"2 sentence take on why it matters","signal":"up|down|neutral","signalLabel":"3-4 words","source":"publication name","deeperAngle":"one sentence angle for deeper research"}`;
+
+  const resp = await fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-5',
+      max_tokens: 250,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: `What is the most important ${cat.label} story right now? Today is ${new Date().toLocaleDateString('en-NZ', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}.` }],
+      tools: [{ type: 'web_search_20250305', name: 'web_search' }]
+    })
+  });
+
+  const data = await resp.json();
+  const textBlocks = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
+  const clean = textBlocks.replace(/```json|```/g, '').trim();
+
+  // Find JSON in the response
+  const jsonMatch = clean.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) throw new Error('No JSON found');
+  return JSON.parse(jsonMatch[0]);
+}
+
+/* ── DIVE DEEPER ── */
+async function diveDeeper(storyId) {
+  const story = stories.find(s => s.id === storyId);
+  if (!story) return;
+
+  const btn = document.getElementById(`dive-${storyId}`);
+  if (btn) { btn.disabled = true; btn.textContent = 'Researching…'; }
+
+  const card = document.getElementById(`card-${storyId}`);
+  let expandEl = document.getElementById(`expand-${storyId}`);
+
+  if (!expandEl) {
+    expandEl = document.createElement('div');
+    expandEl.id = `expand-${storyId}`;
+    expandEl.className = 'card-expanded';
+    expandEl.innerHTML = `<div class="exp-label">↓ Deep Dive</div><div class="typing-dots-inline">Researching deeper…</div>`;
+    card.appendChild(expandEl);
+  }
+
+  try {
+    const resp = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5',
+        max_tokens: 600,
+        system: `You are TechBrief. The user wants to go deeper on this story: "${story.headline}". Search for more detail and write a 3-4 paragraph deep dive. Be specific, cite actual details found. No fluff. Write for a technical audience.`,
+        messages: [{ role: 'user', content: `Go deeper on: ${story.headline}. Angle: ${story.data.deeperAngle}` }],
+        tools: [{ type: 'web_search_20250305', name: 'web_search' }]
+      })
+    });
+    const data = await resp.json();
+    const text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('') || 'Could not retrieve deeper analysis.';
+    expandEl.innerHTML = `<div class="exp-label">↓ Deep Dive</div>${text}`;
+  } catch {
+    expandEl.innerHTML = `<div class="exp-label">↓ Deep Dive</div>Could not load deeper analysis. Check your connection.`;
+  }
+
+  if (btn) { btn.disabled = false; btn.textContent = 'Dive deeper ↓'; }
+}
+
+/* ── RENDER STORIES ── */
+function renderStories() {
+  const main = document.getElementById('mainContent');
+  const filtered = activeFilter === 'all' ? stories : stories.filter(s => s.catId === activeFilter);
+
+  if (!filtered.length) {
+    main.innerHTML = `<div class="empty"><div class="empty-ico">📭</div><div class="empty-title">No stories yet</div><div class="empty-sub">Hit refresh to generate today's brief.</div></div>`;
+    return;
+  }
+
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('en-NZ', { hour: '2-digit', minute: '2-digit' });
+
+  // Group by category if showing all
+  const toRender = activeFilter === 'all'
+    ? CATEGORIES.map(cat => ({ cat, items: stories.filter(s => s.catId === cat.id) })).filter(g => g.items.length)
+    : [{ cat: CATEGORIES.find(c => c.id === activeFilter), items: filtered }];
+
+  let html = `
+    <div class="refresh-bar">
+      <div class="refresh-left">Generated at ${timeStr} · ${stories.length} stories</div>
+      <button class="refresh-btn" id="refreshBtn" onclick="startGeneration()">↻ Refresh</button>
+    </div>
+    <div class="cat-filter">
+      <button class="cat-btn ${activeFilter === 'all' ? 'act' : ''}" onclick="setFilter('all')">All</button>
+      ${CATEGORIES.map(c => `<button class="cat-btn ${activeFilter === c.id ? 'act' : ''}" onclick="setFilter('${c.id}')">${c.icon} ${c.label}</button>`).join('')}
+    </div>
+    <div class="briefs">`;
+
+  toRender.forEach(({ cat, items }) => {
+    if (activeFilter === 'all') {
+      html += `<div class="section-hdr">
+        <div class="section-title">
+          <span style="width:8px;height:8px;border-radius:50%;background:${cat.accent};display:inline-block;flex-shrink:0"></span>
+          ${cat.label}
+        </div>
+        <span class="section-count">${items.length} stor${items.length === 1 ? 'y' : 'ies'}</span>
+      </div>`;
+    }
+
+    items.forEach((story, idx) => {
+      const signalCls = story.data.signal === 'up' ? 'signal-up' : story.data.signal === 'down' ? 'signal-down' : 'signal-neutral';
+      html += `
+        <div class="story-card" id="card-${story.id}" style="animation-delay:${idx * 0.08}s">
+          <div class="card-top">
+            <div class="card-cat-ico" style="background:${cat.dim};color:${cat.accent}">${cat.icon}</div>
+            <div class="card-body">
+              <div class="card-headline">${story.data.headline}</div>
+              <div class="card-brief">${story.data.brief}</div>
+              <div class="card-meta">
+                <span class="card-tag" style="background:${cat.tagBg};color:${cat.tagColor}">${cat.label}</span>
+                <span class="card-signal ${signalCls}">${story.data.signalLabel}</span>
+                <span class="card-time">${story.data.source}</span>
+              </div>
+            </div>
+          </div>
+          <div class="card-actions">
+            <button class="dive-btn" id="dive-${story.id}" onclick="diveDeeper('${story.id}')">Dive deeper ↓</button>
+            <button class="share-btn" onclick="copyHeadline('${story.id}')">Copy</button>
+          </div>
+        </div>`;
+    });
+  });
+
+  html += `</div>
+    <hr>
+    <div class="footer">
+      TechBrief · Daily Tech Intelligence · Built by Miten Chauhan<br>
+      <span style="color:var(--blue)">∿</span> Part of the Apex AI Stack · <a href="https://miten.co.nz" style="color:var(--t2);text-decoration:none">miten.co.nz</a>
+    </div>`;
+
+  main.innerHTML = html;
+}
+
+/* ── FILTER ── */
+function setFilter(id) {
+  activeFilter = id;
+  renderStories();
+  // scroll to top of content
+  document.getElementById('mainContent').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* ── COPY ── */
+function copyHeadline(id) {
+  const story = stories.find(s => s.id === id);
+  if (!story) return;
+  navigator.clipboard.writeText(`${story.data.headline}\n\n${story.data.brief}`).then(() => showToast('📋 Copied to clipboard'));
+}
+
+/* ── GENERATE ── */
+async function startGeneration() {
+  stories = [];
+  activeFilter = 'all';
+  generatedAt = new Date();
+
+  // Show loading state
+  document.getElementById('mainContent').innerHTML = `
+    <div class="loading-wrap" id="loadingWrap">
+      <div class="loading-title">Researching today's tech world…</div>
+      <div class="loading-sub">Running ${CATEGORIES.length} live web searches — one per category.<br>Spaced to avoid API rate limits. Takes ~40 seconds total.</div>
+      <div class="loading-steps" id="loadingSteps"></div>
+    </div>`;
+
+  renderLoadingSteps(-1);
+
+  // Fetch all categories sequentially with delay to avoid rate limits
+  for (let i = 0; i < CATEGORIES.length; i++) {
+    const cat = CATEGORIES[i];
+    renderLoadingSteps(i);
+
+    // 12s delay between calls — web search responses are large (~10-15k tokens)
+    // 4 calls × 15k tokens = 60k, spread over ~36s stays under 30k/min limit
+    if (i > 0) await new Promise(r => setTimeout(r, 12000));
+
+    let retries = 0;
+    let success = false;
+    while (retries < 2 && !success) {
+      try {
+        const data = await fetchCategory(cat);
+        stories.push({ id: `${cat.id}-${Date.now()}`, catId: cat.id, data });
+        success = true;
+      } catch (e) {
+        retries++;
+        if (retries < 2) {
+          // Wait 20s on rate limit before retrying
+          renderLoadingSteps(i, `Rate limit — retrying ${cat.label} in 20s…`);
+          await new Promise(r => setTimeout(r, 20000));
+        } else {
+          // Give up after 2 attempts
+          stories.push({
+            id: `${cat.id}-${Date.now()}`, catId: cat.id,
+            data: {
+              headline: `${cat.label} — Live search unavailable`,
+              brief: 'Could not retrieve live data for this category. Try refreshing.',
+              signal: 'neutral', signalLabel: 'Unavailable',
+              source: 'TechBrief', deeperAngle: 'Try refreshing.'
+            }
+          });
+        }
+      }
+    }
+  }
+
+  renderLoadingSteps(CATEGORIES.length); // all done
+  setTimeout(() => renderStories(), 400);
+}
+
+/* ── TOAST ── */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* ── INIT ── */
+setDate();
+startGeneration(); // Auto-run on load
+</script>
+</body>
+</html>

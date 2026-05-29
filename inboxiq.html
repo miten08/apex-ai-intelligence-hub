@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="description" content="InboxIQ — Miten's Gmail MCP agent. Triage, briefings and smart email drafting. Demo inbox for portfolio.">
+<title>InboxIQ — Gmail AI Agent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+
+[data-theme="dark"]{
+  --bg:#07090f;--s1:#0d1018;--s2:#121520;--s3:#181c28;--s4:#1e2332;
+  --b1:rgba(100,140,255,.07);--b2:rgba(100,140,255,.13);--b3:rgba(100,140,255,.2);
+  --t1:#eef0f8;--t2:#8890b0;--t3:#454868;
+  --blue:#5b8ff9;--blue2:#3b6ff0;--blue3:#1a4fd6;
+  --blue-dim:rgba(91,143,249,.1);--blue-border:rgba(91,143,249,.25);
+  --green:#4ade80;--red:#f87171;--orange:#fb923c;--purple:#a78bfa;--teal:#34d399;
+  --nav-bg:rgba(7,9,15,.94);
+  --urgent:#f87171;--warning:#fb923c;--safe:#4ade80;
+}
+[data-theme="light"]{
+  --bg:#f0f4ff;--s1:#fff;--s2:#e8eeff;--s3:#dce4ff;--s4:#ccd6ff;
+  --b1:rgba(60,100,255,.07);--b2:rgba(60,100,255,.13);--b3:rgba(60,100,255,.2);
+  --t1:#0a0e24;--t2:#444870;--t3:#8890b8;
+  --blue:#2563eb;--blue2:#1d4ed8;--blue3:#1e40af;
+  --blue-dim:rgba(37,99,235,.08);--blue-border:rgba(37,99,235,.2);
+  --green:#16a34a;--red:#dc2626;--orange:#ea580c;--purple:#7c3aed;--teal:#0d9488;
+  --nav-bg:rgba(240,244,255,.94);
+  --urgent:#dc2626;--warning:#ea580c;--safe:#16a34a;
+}
+
+html,body{min-height:100%;background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;transition:background .25s,color .25s}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px}
+.app{max-width:700px;margin:0 auto;padding:0 0 80px}
+
+/* ── NAV ── */
+.nav{display:flex;justify-content:space-between;align-items:center;padding:11px 16px;border-bottom:1px solid var(--b1);background:var(--nav-bg);backdrop-filter:blur(16px);position:sticky;top:0;z-index:300}
+.nav-left{display:flex;align-items:center;gap:10px}
+.nav-logo{display:flex;align-items:center;gap:8px}
+.nav-ico{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,#4285f4,#1a56db);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.nav-title{font-family:'DM Serif Display',serif;font-size:16px;letter-spacing:-.2px}
+.nav-title em{color:var(--blue);font-style:italic}
+.live-pill{display:inline-flex;align-items:center;gap:4px;font-size:9px;padding:3px 9px;border-radius:99px;background:rgba(74,222,128,.1);border:.5px solid rgba(74,222,128,.25);color:var(--green);font-weight:700;letter-spacing:.04em}
+.ldot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:glow 2s infinite;flex-shrink:0}
+@keyframes glow{0%,100%{opacity:.3}50%{opacity:1}}
+.nav-right{display:flex;gap:6px;align-items:center}
+.nav-back{font-size:11px;color:var(--t3);text-decoration:none;padding:5px 10px;border-radius:6px;border:1px solid var(--b1);background:var(--s2);transition:all .15s}
+.nav-back:hover{color:var(--t1)}
+.theme-btn{width:30px;height:30px;border-radius:7px;border:1px solid var(--b1);background:var(--s2);color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .15s}
+.theme-btn:hover{border-color:var(--blue);color:var(--blue)}
+
+/* ── HERO ── */
+.hero{padding:20px 16px 16px;border-bottom:1px solid var(--b1);background:linear-gradient(180deg,var(--s1) 0%,var(--bg) 100%)}
+.hero h1{font-family:'DM Serif Display',serif;font-size:26px;font-weight:400;letter-spacing:-.4px;line-height:1.15}
+.hero h1 em{color:var(--blue);font-style:italic}
+.hero-sub{font-size:12px;color:var(--t3);margin-top:5px;line-height:1.65;max-width:460px}
+.hero-badges{display:flex;gap:5px;flex-wrap:wrap;margin-top:10px}
+.hbadge{font-size:9px;padding:3px 9px;border-radius:99px;font-weight:600;border:.5px solid transparent}
+.hbadge.b{background:var(--blue-dim);color:var(--blue);border-color:var(--blue-border)}
+.hbadge.g{background:rgba(74,222,128,.08);color:var(--green);border-color:rgba(74,222,128,.2)}
+.hbadge.o{background:rgba(251,146,60,.08);color:var(--orange);border-color:rgba(251,146,60,.2)}
+
+/* ── INBOX STATS ── */
+.inbox-stats{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--b1)}
+.istat{padding:12px 14px;text-align:center;border-right:.5px solid var(--b1)}
+.istat:last-child{border-right:none}
+.istat-val{font-family:'DM Serif Display',serif;font-size:22px;line-height:1}
+.istat-val.urgent{color:var(--urgent)}
+.istat-val.blue{color:var(--blue)}
+.istat-val.safe{color:var(--safe)}
+.istat-lbl{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-top:3px}
+
+/* ── TABS ── */
+.tab-row{display:flex;gap:3px;padding:10px 16px;border-bottom:1px solid var(--b1);background:var(--bg);position:sticky;top:48px;z-index:200;backdrop-filter:blur(14px);overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tab-row::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;padding:7px 14px;border-radius:10px;border:none;background:transparent;color:var(--t3);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;white-space:nowrap}
+.tab.act{background:var(--s2);color:var(--t1);border:.5px solid var(--b2)}
+
+/* ── EMAIL CARDS ── */
+.email-list{display:flex;flex-direction:column;gap:0;padding:0 16px}
+.email-card{background:var(--s1);border:.5px solid var(--b1);border-radius:14px;margin-bottom:8px;overflow:hidden;transition:all .18s;cursor:pointer;animation:fadeUp .35s ease both}
+.email-card:hover{border-color:var(--b2);transform:translateY(-1px)}
+.email-card.unread{border-left:3px solid var(--blue)}
+.email-card.urgent{border-left:3px solid var(--urgent)}
+.email-card.warning{border-left:3px solid var(--warning)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.email-top{display:flex;align-items:flex-start;gap:10px;padding:12px 13px 10px}
+.email-avatar{width:34px;height:34px;border-radius:99px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;color:#fff}
+.email-body{flex:1;min-width:0}
+.email-sender{font-size:12px;font-weight:600;color:var(--t1);margin-bottom:2px;display:flex;align-items:center;gap:6px}
+.email-subject{font-size:13px;color:var(--t1);line-height:1.4;margin-bottom:4px;font-weight:500}
+.email-preview{font-size:11px;color:var(--t3);line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.email-meta{display:flex;align-items:center;justify-content:space-between;margin-top:5px}
+.email-time{font-family:'Courier Prime',monospace;font-size:9px;color:var(--t3)}
+.email-tags{display:flex;gap:4px}
+.etag{font-size:8px;padding:2px 7px;border-radius:99px;font-weight:700}
+.etag.urgent{background:rgba(248,113,113,.12);color:var(--urgent);border:.5px solid rgba(248,113,113,.25)}
+.etag.action{background:var(--blue-dim);color:var(--blue);border:.5px solid var(--blue-border)}
+.etag.info{background:rgba(167,139,250,.1);color:var(--purple);border:.5px solid rgba(167,139,250,.2)}
+.etag.paid{background:rgba(74,222,128,.08);color:var(--safe);border:.5px solid rgba(74,222,128,.2)}
+.etag.unread-dot{width:7px;height:7px;border-radius:50%;background:var(--blue);flex-shrink:0;margin-top:2px}
+
+/* ── QUICK ACTIONS ── */
+.quick-row{display:flex;gap:6px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--b1);overflow-x:auto;-webkit-overflow-scrolling:touch}
+.quick-row::-webkit-scrollbar{display:none}
+.qbtn{display:inline-flex;align-items:center;gap:6px;padding:8px 13px;border-radius:11px;border:.5px solid var(--b2);background:var(--s1);color:var(--t2);font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;white-space:nowrap;flex-shrink:0}
+.qbtn:hover{border-color:var(--blue-border);color:var(--blue);background:var(--blue-dim)}
+.qbtn .qico{font-size:14px}
+
+/* ── CHAT ── */
+.chat-wrap{margin:0 16px;background:var(--s1);border:.5px solid var(--b1);border-radius:18px;overflow:hidden}
+.chat-msgs{display:flex;flex-direction:column;gap:8px;padding:14px;min-height:220px;max-height:420px;overflow-y:auto}
+.bubble{padding:11px 14px;border-radius:14px;font-size:13px;line-height:1.7;white-space:pre-wrap;word-break:break-word;animation:fadeUp .3s ease}
+.bubble.ai{background:var(--s2);border:.5px solid var(--b1);border-radius:4px 14px 14px 14px;color:var(--t2)}
+.bubble.user{background:linear-gradient(135deg,var(--blue2),var(--blue3));color:#fff;border-radius:14px 4px 14px 14px;align-self:flex-end;max-width:88%}
+.typing-dots{display:flex;gap:4px;padding:11px 14px;align-self:flex-start}
+.typing-dots span{width:6px;height:6px;border-radius:50%;background:var(--blue);animation:dot 1.2s ease-in-out infinite;opacity:.4}
+.typing-dots span:nth-child(2){animation-delay:.2s}.typing-dots span:nth-child(3){animation-delay:.4s}
+@keyframes dot{0%,80%,100%{transform:scale(.7);opacity:.4}40%{transform:scale(1.1);opacity:1}}
+.chat-input-row{display:flex;gap:8px;padding:10px 13px;border-top:.5px solid var(--b1);align-items:flex-end}
+.ta-wrap{flex:1;background:var(--s2);border:.5px solid var(--b2);border-radius:13px;display:flex;align-items:flex-end;transition:border-color .15s}
+.ta-wrap:focus-within{border-color:var(--blue-border)}
+.ta{flex:1;background:transparent;border:none;outline:none;color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;resize:none;line-height:1.5;padding:10px 12px;min-height:42px;max-height:110px;overflow-y:auto}
+.ta::placeholder{color:var(--t3)}
+.send-btn{width:38px;height:38px;border-radius:11px;border:none;background:linear-gradient(135deg,var(--blue2),var(--blue3));color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;box-shadow:0 2px 12px rgba(59,111,240,.3)}
+.send-btn:disabled{background:var(--s2)!important;color:var(--t3);cursor:not-allowed;box-shadow:none}
+
+/* ── COMPOSE ── */
+.compose-wrap{margin:0 16px}
+.compose-field{margin-bottom:10px}
+.field-label{font-size:10px;font-weight:600;letter-spacing:.06em;color:var(--t3);text-transform:uppercase;margin-bottom:5px}
+.field-input{width:100%;background:var(--s1);border:.5px solid var(--b2);border-radius:11px;color:var(--t1);font-family:'DM Sans',sans-serif;font-size:13px;padding:10px 13px;outline:none;transition:border-color .15s}
+.field-input:focus{border-color:var(--blue-border)}
+.field-input::placeholder{color:var(--t3)}
+.field-ta{min-height:120px;resize:none;line-height:1.65}
+.compose-actions{display:flex;gap:8px;margin-top:12px}
+.compose-primary{flex:1;padding:11px;border-radius:11px;border:none;background:linear-gradient(135deg,var(--blue2),var(--blue3));color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .15s;box-shadow:0 2px 12px rgba(59,111,240,.25)}
+.compose-primary:hover{opacity:.88}
+.compose-primary:disabled{opacity:.4;cursor:not-allowed}
+.compose-sec{padding:11px 16px;border-radius:11px;border:.5px solid var(--b2);background:var(--s2);color:var(--t2);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.compose-sec:hover{color:var(--t1)}
+.compose-result{margin-top:12px;background:var(--s1);border:.5px solid var(--blue-border);border-radius:14px;padding:14px;font-size:13px;color:var(--t2);line-height:1.8;animation:fadeUp .3s ease}
+.compose-result-lbl{font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--blue);text-transform:uppercase;margin-bottom:8px}
+
+/* ── SECTION HEADER ── */
+.sec{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);padding:0 16px;margin:14px 0 9px;display:flex;align-items:center;gap:8px}
+.sec::after{content:'';flex:1;height:.5px;background:var(--b1)}
+
+/* ── TRIAGE BANNER ── */
+.triage-banner{margin:12px 16px;background:var(--s1);border:.5px solid var(--blue-border);border-radius:14px;padding:13px 14px;display:flex;align-items:flex-start;gap:10px}
+.tb-ico{width:32px;height:32px;border-radius:8px;background:var(--blue-dim);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.tb-body{flex:1}
+.tb-title{font-size:12px;font-weight:700;color:var(--t1);margin-bottom:3px}
+.tb-sub{font-size:11px;color:var(--t3);line-height:1.6}
+
+/* ── DEMO NOTICE ── */
+.demo-notice{margin:10px 16px 0;background:rgba(251,146,60,.06);border:.5px solid rgba(251,146,60,.2);border-radius:10px;padding:8px 12px;font-size:11px;color:var(--orange);display:flex;align-items:center;gap:7px}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--s2);border:.5px solid var(--b3);border-radius:12px;padding:10px 18px;font-size:12px;color:var(--t1);opacity:0;transition:all .3s;z-index:999;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── FOOTER ── */
+hr{border:none;border-top:.5px solid var(--b1);margin:24px 16px}
+.footer{text-align:center;padding:14px 20px 0;font-size:11px;color:var(--t3);line-height:2}
+
+/* ── LIGHT ── */
+[data-theme="light"] .chat-wrap{background:#fff}
+[data-theme="light"] .bubble.ai{background:#eef2ff;color:#444870}
+[data-theme="light"] .ta-wrap{background:#eef2ff;border-color:rgba(60,100,255,.15)}
+[data-theme="light"] .email-card{background:#fff}
+[data-theme="light"] .compose-wrap .field-input{background:#fff;border-color:rgba(60,100,255,.15)}
+[data-theme="light"] .triage-banner{background:#fff}
+[data-theme="light"] .qbtn{background:#fff}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-left">
+    <div class="nav-logo">
+      <div class="nav-ico">✉️</div>
+      <div class="nav-title">Inbox<em>IQ</em></div>
+    </div>
+    <div class="live-pill"><span class="ldot"></span>GMAIL MCP AGENT</div>
+  </div>
+  <div class="nav-right">
+    <a class="nav-back" href="apex.html">← Apex</a>
+    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>Inbox<em>IQ</em> —<br>Your Gmail AI Agent</h1>
+  <div class="hero-sub">A Gmail MCP agent that triages your inbox, generates morning briefings and drafts replies — with full multi-turn memory. Runs on a realistic NZ demo inbox here because connecting a real personal Gmail to a public portfolio would be a privacy risk. The MCP integration is fully built and live inside Claude.</div>
+  <div class="hero-badges">
+    <span class="hbadge b">Gmail MCP</span>
+    <span class="hbadge b">Multi-turn memory</span>
+    <span class="hbadge o">Demo inbox</span>
+    <span class="hbadge g">Claude API</span>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="inbox-stats">
+  <div class="istat"><div class="istat-val urgent">3</div><div class="istat-lbl">Urgent</div></div>
+  <div class="istat"><div class="istat-val blue">7</div><div class="istat-lbl">Unread</div></div>
+  <div class="istat"><div class="istat-val" style="color:var(--t1)">10</div><div class="istat-lbl">Total</div></div>
+  <div class="istat"><div class="istat-val safe">2</div><div class="istat-lbl">Action req.</div></div>
+</div>
+
+<!-- TABS -->
+<div class="tab-row">
+  <button class="tab act" id="tabInbox" onclick="switchTab('inbox')">📬 Inbox</button>
+  <button class="tab" id="tabChat" onclick="switchTab('chat')">💬 Ask Agent</button>
+  <button class="tab" id="tabBriefing" onclick="switchTab('briefing')">☀️ Briefing</button>
+  <button class="tab" id="tabCompose" onclick="switchTab('compose')">✏️ Compose</button>
+</div>
+
+<!-- INBOX TAB -->
+<div id="viewInbox">
+  <div class="demo-notice">📋 Portfolio demo — realistic NZ inbox data. Connecting a real Gmail account to a public site would be a privacy risk, so the agent runs on a representative dataset. The Gmail MCP integration is fully built and works live inside Claude.</div>
+  <div class="sec" style="margin-top:14px">Priority emails</div>
+  <div class="email-list" id="emailList"></div>
+  <hr>
+  <div class="footer">
+    InboxIQ · Gmail MCP Agent · Built by Miten Chauhan<br>
+    <span style="color:var(--blue)">✉</span> Part of the Apex AI Stack · <a href="https://miten.co.nz" style="color:var(--t2);text-decoration:none">miten.co.nz</a>
+  </div>
+</div>
+
+<!-- CHAT TAB -->
+<div id="viewChat" style="display:none">
+  <div class="quick-row" id="quickRow"></div>
+  <div class="sec">Ask about your inbox</div>
+  <div class="chat-wrap">
+    <div class="chat-msgs" id="chatMsgs">
+      <div class="bubble ai">Hey Miten 👋 I'm InboxIQ — your Gmail AI agent. I have access to your inbox via MCP and can see your 10 most recent emails. Ask me anything — I'll triage, summarise, and flag what matters.</div>
+    </div>
+    <div class="chat-input-row">
+      <div class="ta-wrap">
+        <textarea class="ta" id="chatInput" placeholder="What's urgent in my inbox? Flag anything from IRD…" rows="1" onkeydown="chatKey(event)" oninput="autoResize(this)"></textarea>
+      </div>
+      <button class="send-btn" id="sendBtn" onclick="sendChat()">↑</button>
+    </div>
+  </div>
+  <hr>
+  <div class="footer">InboxIQ · Gmail MCP Agent · Built by Miten Chauhan<br><span style="color:var(--blue)">✉</span> Part of the Apex AI Stack · <a href="https://miten.co.nz" style="color:var(--t2);text-decoration:none">miten.co.nz</a></div>
+</div>
+
+<!-- BRIEFING TAB -->
+<div id="viewBriefing" style="display:none">
+  <div class="triage-banner">
+    <div class="tb-ico">☀️</div>
+    <div class="tb-body">
+      <div class="tb-title">Morning Briefing — <span id="briefDate">—</span></div>
+      <div class="tb-sub">Claude reads your inbox and writes a sharp, prioritised brief. No fluff — just what you need to know right now.</div>
+    </div>
+  </div>
+  <div style="padding:0 16px;margin-top:4px">
+    <button class="compose-primary" id="briefBtn" onclick="generateBriefing()" style="width:100%;margin-bottom:0">Generate morning briefing ☀️</button>
+  </div>
+  <div id="briefingResult" style="padding:0 16px"></div>
+  <hr>
+  <div class="footer">InboxIQ · Gmail MCP Agent · Built by Miten Chauhan<br><span style="color:var(--blue)">✉</span> Part of the Apex AI Stack · <a href="https://miten.co.nz" style="color:var(--t2);text-decoration:none">miten.co.nz</a></div>
+</div>
+
+<!-- COMPOSE TAB -->
+<div id="viewCompose" style="display:none">
+  <div class="sec">Smart compose</div>
+  <div class="compose-wrap">
+    <div class="compose-field">
+      <div class="field-label">To</div>
+      <input class="field-input" id="composeTo" placeholder="Recipient name or email…">
+    </div>
+    <div class="compose-field">
+      <div class="field-label">Subject / context</div>
+      <input class="field-input" id="composeSubject" placeholder="e.g. Reply to IRD tax assessment, follow up on job application…">
+    </div>
+    <div class="compose-field">
+      <div class="field-label">Key points to include</div>
+      <textarea class="field-input field-ta" id="composePoints" placeholder="What should this email say? Even rough notes work — Claude will write it properly."></textarea>
+    </div>
+    <div class="compose-actions">
+      <button class="compose-primary" id="composeBtn" onclick="composeDraft()">Draft with Claude ✦</button>
+      <button class="compose-sec" onclick="clearCompose()">Clear</button>
+    </div>
+    <div id="composeResult" style="display:none"></div>
+  </div>
+  <hr>
+  <div class="footer">InboxIQ · Gmail MCP Agent · Built by Miten Chauhan<br><span style="color:var(--blue)">✉</span> Part of the Apex AI Stack · <a href="https://miten.co.nz" style="color:var(--t2);text-decoration:none">miten.co.nz</a></div>
+</div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const API_URL = 'https://nexus-api.mitenchauhan08.workers.dev';
+
+/* ── DEMO INBOX ── */
+const EMAILS = [
+  {
+    id: 1, sender: 'IRD New Zealand', email: 'donotreply@ird.govt.nz',
+    subject: 'Your 2024 income tax assessment is ready',
+    preview: 'Your income tax assessment for the year ended 31 March 2024 is now available in myIR.',
+    time: '3 days ago', unread: true, priority: 'urgent',
+    tags: ['urgent', 'action'],
+    avatarBg: '#1a56db', avatarText: 'IR',
+    category: 'Government'
+  },
+  {
+    id: 2, sender: 'ANZ Bank', email: 'alerts@anz.co.nz',
+    subject: 'Low balance alert: $42 in everyday account',
+    preview: 'Your ANZ everyday account balance has fallen below your alert threshold of $100.',
+    time: 'Yesterday', unread: true, priority: 'urgent',
+    tags: ['urgent', 'action'],
+    avatarBg: '#007dba', avatarText: 'ANZ',
+    category: 'Banking'
+  },
+  {
+    id: 3, sender: 'Spark IT Security', email: 'security@spark.co.nz',
+    subject: 'Your password expires in 3 days — reset now',
+    preview: 'Your Spark account password will expire on 23 May 2026. Reset it now to avoid losing access.',
+    time: 'This morning', unread: true, priority: 'warning',
+    tags: ['action'],
+    avatarBg: '#e3000b', avatarText: 'SP',
+    category: 'Security'
+  },
+  {
+    id: 4, sender: 'Westpac NZ', email: 'alerts@westpac.co.nz',
+    subject: 'Direct debit scheduled: $1,800 Rent — due today',
+    preview: 'A direct debit of $1,800.00 to Property Management NZ is scheduled for today.',
+    time: '2 days ago', unread: false, priority: 'warning',
+    tags: ['action'],
+    avatarBg: '#d5002b', avatarText: 'WP',
+    category: 'Banking'
+  },
+  {
+    id: 5, sender: 'Seek', email: 'alerts@seek.co.nz',
+    subject: '3 new jobs match your alert: Network Security Engineer',
+    preview: 'Network Security Engineer (WLG) $110–135K · Senior SOC Analyst · Cybersecurity Consultant',
+    time: 'Yesterday', unread: true, priority: 'normal',
+    tags: ['info'],
+    avatarBg: '#00b4d8', avatarText: 'SK',
+    category: 'Jobs'
+  },
+  {
+    id: 6, sender: 'LinkedIn', email: 'messaging-digest@linkedin.com',
+    subject: 'You appeared in 12 searches this week',
+    preview: 'Your profile was viewed by recruiters at Datacom, Spark, and 3 others.',
+    time: '5h ago', unread: true, priority: 'normal',
+    tags: ['info'],
+    avatarBg: '#0a66c2', avatarText: 'in',
+    category: 'Career'
+  },
+  {
+    id: 7, sender: 'One NZ', email: 'billing@one.nz',
+    subject: 'Your bill $89.00 is ready to view',
+    preview: 'Your One NZ monthly bill of $89.00 is available. Payment due 30 May 2026.',
+    time: '2 days ago', unread: true, priority: 'normal',
+    tags: ['action'],
+    avatarBg: '#6d28d9', avatarText: 'ON',
+    category: 'Bills'
+  },
+  {
+    id: 8, sender: 'Spotify', email: 'no-reply@spotify.com',
+    subject: 'Invoice $13.99 for May 2026',
+    preview: 'Thanks for your Spotify Premium subscription. $13.99 charged to your card ending 4242.',
+    time: '2 days ago', unread: false, priority: 'normal',
+    tags: ['paid'],
+    avatarBg: '#1db954', avatarText: 'SP',
+    category: 'Subscriptions'
+  },
+  {
+    id: 9, sender: 'ANZ Bank', email: 'statements@anz.co.nz',
+    subject: 'Your May 2026 statement is ready',
+    preview: 'Your ANZ bank statement for May 2026 is now available to view in ANZ Internet Banking.',
+    time: '2h ago', unread: true, priority: 'normal',
+    tags: ['info'],
+    avatarBg: '#007dba', avatarText: 'ANZ',
+    category: 'Banking'
+  },
+  {
+    id: 10, sender: 'Les Mills NZ', email: 'billing@lesmills.co.nz',
+    subject: 'Monthly membership renewal $35 — processed',
+    preview: 'Your Les Mills gym membership has been renewed. $35.00 charged for May 2026.',
+    time: '5 days ago', unread: false, priority: 'normal',
+    tags: ['paid'],
+    avatarBg: '#ef4444', avatarText: 'LM',
+    category: 'Health'
+  }
+];
+
+const INBOX_CONTEXT = `DEMO INBOX SNAPSHOT — 10 emails, NZ context:
+1. IRD — "Your 2024 income tax assessment is ready" — 3 days ago — UNREAD — Action required
+2. ANZ Bank — "Low balance alert: $42 in everyday account" — Yesterday — UNREAD — Urgent
+3. Spark — "Your password expires in 3 days" — This morning — UNREAD — Action required
+4. Westpac — "Direct debit $1,800 Rent due today" — 2 days ago — Action required
+5. Seek — "3 new jobs: Network Security Engineer WLG $110–135K" — Yesterday — UNREAD
+6. LinkedIn — "You appeared in 12 searches this week — Datacom, Spark viewed your profile" — 5h ago — UNREAD
+7. One NZ — "Bill $89.00 ready, due 30 May" — 2 days ago — UNREAD — Action required
+8. Spotify — "Invoice $13.99 May 2026 — paid" — 2 days ago
+9. ANZ Bank — "May 2026 statement ready" — 2h ago — UNREAD
+10. Les Mills — "Membership $35 renewed — paid" — 5 days ago
+
+Priority order: IRD (tax), ANZ low balance, Seek jobs, Westpac rent, Spark password, One NZ bill.
+Miten's profile: NZ-based, job hunting in tech/cybersecurity, saving for property deposit, budget-conscious.
+This is demo data — never fabricate details beyond what's listed.`;
+
+const GM_SYS = `You are InboxIQ, Miten's Gmail AI agent. Use the demo inbox data below. Triage by priority, be concise and direct. Never fabricate email content beyond what is listed.\n\n${INBOX_CONTEXT}`;
+
+const QUICK_ACTIONS = [
+  { icon: '🌅', label: 'Morning brief', prompt: 'Morning briefing — what\'s urgent and what needs my attention today?' },
+  { icon: '🔴', label: 'Urgent only', prompt: 'Show only urgent emails that need action today' },
+  { icon: '💼', label: 'Job alerts', prompt: 'Any job-related emails? Summarise the opportunities' },
+  { icon: '🏦', label: 'Banking', prompt: 'What banking or financial emails do I have?' },
+  { icon: '📋', label: 'Action list', prompt: 'Give me a prioritised action list from my inbox' },
+  { icon: '🌙', label: 'Evening wrap', prompt: 'Evening summary — what came in today and what\'s still outstanding?' },
+];
+
+let chatHistory = [];
+let chatBusy = false;
+let activeTab = 'inbox';
+
+/* ── THEME ── */
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('themeBtn').textContent = isDark ? '☀️' : '🌙';
+}
+
+/* ── TABS ── */
+function switchTab(t) {
+  ['inbox','chat','briefing','compose'].forEach(v => {
+    document.getElementById('view' + v.charAt(0).toUpperCase() + v.slice(1)).style.display = v === t ? '' : 'none';
+    document.getElementById('tab' + v.charAt(0).toUpperCase() + v.slice(1)).classList.toggle('act', v === t);
+  });
+  activeTab = t;
+}
+
+/* ── RENDER EMAILS ── */
+function renderEmails() {
+  const list = document.getElementById('emailList');
+  // Sort: urgent first, then unread, then normal
+  const sorted = [...EMAILS].sort((a, b) => {
+    const p = { urgent: 0, warning: 1, normal: 2 };
+    return (p[a.priority] - p[b.priority]) || (b.unread - a.unread);
+  });
+
+  list.innerHTML = sorted.map((e, i) => {
+    const tagsHTML = e.tags.map(t => `<span class="etag ${t}">${
+      t === 'urgent' ? '🔴 Urgent' :
+      t === 'action' ? '⚡ Action' :
+      t === 'info' ? 'ℹ Info' :
+      t === 'paid' ? '✓ Paid' : t
+    }</span>`).join('');
+
+    return `<div class="email-card ${e.unread ? (e.priority === 'urgent' ? 'urgent' : e.priority === 'warning' ? 'warning' : 'unread') : ''}" style="animation-delay:${i * 0.05}s">
+      <div class="email-top">
+        <div class="email-avatar" style="background:${e.avatarBg}">${e.avatarText}</div>
+        <div class="email-body">
+          <div class="email-sender">
+            ${e.sender}
+            ${e.unread ? '<span class="etag-unread-dot" style="width:6px;height:6px;border-radius:50%;background:var(--blue);display:inline-block;flex-shrink:0"></span>' : ''}
+          </div>
+          <div class="email-subject">${e.subject}</div>
+          <div class="email-preview">${e.preview}</div>
+          <div class="email-meta">
+            <div class="email-tags">${tagsHTML}</div>
+            <div class="email-time">${e.time}</div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ── QUICK ACTIONS ── */
+function renderQuickActions() {
+  const el = document.getElementById('quickRow');
+  el.innerHTML = QUICK_ACTIONS.map(q =>
+    `<button class="qbtn" onclick="quickSend('${q.prompt.replace(/'/g, "\\'")}')">
+      <span class="qico">${q.icon}</span>${q.label}
+    </button>`
+  ).join('');
+}
+
+function quickSend(prompt) {
+  document.getElementById('chatInput').value = prompt;
+  sendChat();
+}
+
+/* ── CHAT ── */
+function chatKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); } }
+function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 110) + 'px'; }
+
+function appendBubble(text, cls) {
+  const msgs = document.getElementById('chatMsgs');
+  const div = document.createElement('div');
+  div.className = `bubble ${cls}`;
+  div.textContent = text;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function showTyping() {
+  const msgs = document.getElementById('chatMsgs');
+  const d = document.createElement('div');
+  d.className = 'typing-dots';
+  d.id = 'typingDots';
+  d.innerHTML = '<span></span><span></span><span></span>';
+  msgs.appendChild(d);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function removeTyping() {
+  const d = document.getElementById('typingDots');
+  if (d) d.remove();
+}
+
+async function sendChat() {
+  if (chatBusy) return;
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+  document.getElementById('sendBtn').disabled = true;
+  chatBusy = true;
+
+  appendBubble(msg, 'user');
+  chatHistory.push({ role: 'user', content: msg });
+  showTyping();
+
+  try {
+    const resp = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5',
+        max_tokens: 600,
+        system: GM_SYS,
+        messages: chatHistory
+      })
+    });
+    const data = await resp.json();
+    const reply = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('') || 'Sorry, no response. Try again.';
+    removeTyping();
+    appendBubble(reply, 'ai');
+    chatHistory.push({ role: 'assistant', content: reply });
+    if (chatHistory.length > 24) chatHistory = chatHistory.slice(-24);
+  } catch {
+    removeTyping();
+    appendBubble('⚠️ Connection issue — check your Cloudflare Worker.', 'ai');
+  }
+
+  chatBusy = false;
+  document.getElementById('sendBtn').disabled = false;
+}
+
+/* ── BRIEFING ── */
+async function generateBriefing() {
+  const btn = document.getElementById('briefBtn');
+  const result = document.getElementById('briefingResult');
+  btn.disabled = true;
+  btn.textContent = 'Generating…';
+
+  result.innerHTML = `<div style="margin-top:12px;background:var(--s1);border:.5px solid var(--b1);border-radius:14px;padding:14px">
+    <div class="typing-dots"><span></span><span></span><span></span></div>
+  </div>`;
+
+  const now = new Date();
+  const dayName = now.toLocaleDateString('en-NZ', { weekday: 'long', day: 'numeric', month: 'long' });
+
+  try {
+    const resp = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5',
+        max_tokens: 600,
+        system: `You are InboxIQ, Miten's Gmail AI agent. Write a sharp morning briefing for ${dayName}. Structure it as: 1) One punchy opening sentence on overall inbox status 2) Urgent items (numbered, action-focused) 3) Worth knowing (quick bullets) 4) One sentence close. Use plain text with clear formatting. Be direct — this is for Miten's eyes only.\n\n${INBOX_CONTEXT}`,
+        messages: [{ role: 'user', content: `Write my morning inbox briefing for ${dayName}.` }]
+      })
+    });
+    const data = await resp.json();
+    const text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('') || 'Could not generate briefing.';
+    result.innerHTML = `<div style="margin-top:12px;background:var(--s1);border:.5px solid var(--blue-border);border-radius:14px;padding:14px;animation:fadeUp .3s ease">
+      <div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:10px">☀️ Morning Briefing · ${dayName}</div>
+      <div style="font-size:13px;color:var(--t2);line-height:1.85;white-space:pre-wrap">${text}</div>
+    </div>`;
+  } catch {
+    result.innerHTML = `<div style="margin-top:12px;padding:14px;font-size:12px;color:var(--t3)">Could not generate briefing. Check your API connection.</div>`;
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Regenerate ↺';
+}
+
+/* ── COMPOSE ── */
+async function composeDraft() {
+  const to = document.getElementById('composeTo').value.trim();
+  const subject = document.getElementById('composeSubject').value.trim();
+  const points = document.getElementById('composePoints').value.trim();
+
+  if (!subject && !points) { showToast('Add a subject or key points first'); return; }
+
+  const btn = document.getElementById('composeBtn');
+  const result = document.getElementById('composeResult');
+  btn.disabled = true;
+  btn.textContent = 'Drafting…';
+  result.style.display = 'block';
+  result.innerHTML = `<div class="compose-result"><div class="compose-result-lbl">Drafting…</div><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+
+  try {
+    const resp = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5',
+        max_tokens: 500,
+        system: `You are InboxIQ, Miten's email drafting assistant. Miten is based in New Zealand, works in tech/cybersecurity. Write professional but natural emails. Match the tone to the context. Output ONLY the email body — no subject line, no explanation. Start with the greeting.`,
+        messages: [{ role: 'user', content: `Write an email${to ? ` to ${to}` : ''}.\nContext/subject: ${subject}\nKey points to include: ${points}` }]
+      })
+    });
+    const data = await resp.json();
+    const draft = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('') || 'Could not draft email.';
+    result.innerHTML = `<div class="compose-result">
+      <div class="compose-result-lbl">✦ Draft ready</div>
+      <div style="white-space:pre-wrap;font-size:13px;color:var(--t2);line-height:1.8">${draft}</div>
+      <div style="display:flex;gap:7px;margin-top:12px">
+        <button class="compose-primary" style="flex:1" onclick="copyDraft()">Copy draft</button>
+        <button class="compose-sec" onclick="clearCompose()">Start over</button>
+      </div>
+    </div>`;
+    window._lastDraft = draft;
+  } catch {
+    result.innerHTML = `<div class="compose-result" style="color:var(--t3)">Could not draft. Check your API connection.</div>`;
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Draft with Claude ✦';
+}
+
+function copyDraft() {
+  if (window._lastDraft) {
+    navigator.clipboard.writeText(window._lastDraft).then(() => showToast('📋 Draft copied'));
+  }
+}
+
+function clearCompose() {
+  document.getElementById('composeTo').value = '';
+  document.getElementById('composeSubject').value = '';
+  document.getElementById('composePoints').value = '';
+  document.getElementById('composeResult').style.display = 'none';
+  document.getElementById('composeBtn').textContent = 'Draft with Claude ✦';
+  document.getElementById('composeBtn').disabled = false;
+}
+
+/* ── UTILS ── */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* ── INIT ── */
+document.getElementById('briefDate').textContent = new Date().toLocaleDateString('en-NZ', { weekday: 'long', day: 'numeric', month: 'long' });
+renderEmails();
+renderQuickActions();
+</script>
+</body>
+</html>

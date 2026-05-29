@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="description" content="CapitalLens — NZ financial research tool by Miten Chauhan. Live NZ rates, demo financial profile, advisor chat.">
+<title>CapitalLens — NZ Financial Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+
+[data-theme="dark"]{
+  --bg:#080700;--s1:#0f0e06;--s2:#16140a;--s3:#1e1b0e;--s4:#272312;
+  --b1:rgba(240,180,60,.06);--b2:rgba(240,180,60,.12);--b3:rgba(240,180,60,.2);
+  --t1:#f5f2e8;--t2:#9a9070;--t3:#504830;
+  --gold:#f0b830;--gold2:#d49820;--gold3:#b07810;
+  --gold-dim:rgba(240,184,48,.09);--gold-border:rgba(240,184,48,.22);
+  --green:#4ade80;--red:#f87171;--blue:#60a5fa;--teal:#34d399;--orange:#fb923c;
+  --nav-bg:rgba(8,7,0,.94);
+  --score-bg:conic-gradient(#f0b830 0%, #d49820 72%, rgba(240,184,48,.1) 72%);
+}
+[data-theme="light"]{
+  --bg:#fdf8ec;--s1:#fff;--s2:#fdf3d8;--s3:#faeab8;--s4:#f5dd90;
+  --b1:rgba(160,110,0,.07);--b2:rgba(160,110,0,.13);--b3:rgba(160,110,0,.22);
+  --t1:#1a1400;--t2:#6a5800;--t3:#a09030;
+  --gold:#9a6800;--gold2:#7a5000;--gold3:#5a3800;
+  --gold-dim:rgba(154,104,0,.08);--gold-border:rgba(154,104,0,.22);
+  --green:#16a34a;--red:#dc2626;--blue:#2563eb;--teal:#0d9488;--orange:#ea580c;
+  --nav-bg:rgba(253,248,236,.94);
+}
+
+html,body{min-height:100%;background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;transition:background .25s,color .25s}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px}
+.app{max-width:700px;margin:0 auto;padding:0 0 80px}
+
+/* ── NAV ── */
+.nav{display:flex;justify-content:space-between;align-items:center;padding:11px 16px;border-bottom:1px solid var(--b1);background:var(--nav-bg);backdrop-filter:blur(16px);position:sticky;top:0;z-index:300}
+.nav-left{display:flex;align-items:center;gap:10px}
+.nav-title{font-family:'DM Serif Display',serif;font-size:16px;letter-spacing:-.2px}
+.nav-title em{color:var(--gold);font-style:italic}
+.nav-tag{font-family:'Courier Prime',monospace;font-size:9px;color:var(--t3);background:var(--s2);border:.5px solid var(--b2);padding:3px 9px;border-radius:4px;letter-spacing:.06em}
+.nav-right{display:flex;gap:6px;align-items:center}
+.nav-back{font-size:11px;color:var(--t3);text-decoration:none;padding:5px 10px;border-radius:6px;border:1px solid var(--b1);background:var(--s2);transition:all .15s}
+.nav-back:hover{color:var(--t1)}
+.theme-btn{width:30px;height:30px;border-radius:7px;border:1px solid var(--b1);background:var(--s2);color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px}
+.theme-btn:hover{border-color:var(--gold);color:var(--gold)}
+
+/* ── TICKER ── */
+.ticker{background:var(--s1);border-bottom:1px solid var(--b1);padding:7px 16px;overflow:hidden;position:relative}
+.ticker-inner{display:flex;gap:20px;animation:ticker 25s linear infinite;width:max-content}
+.ticker-inner:hover{animation-play-state:paused}
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.tick-item{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.tick-label{font-family:'Courier Prime',monospace;font-size:10px;color:var(--t3);letter-spacing:.06em}
+.tick-val{font-family:'Courier Prime',monospace;font-size:11px;color:var(--t1);font-weight:700}
+.tick-chg{font-size:9px;padding:1px 6px;border-radius:3px;font-weight:700;font-family:'Courier Prime',monospace}
+.tick-up{background:rgba(74,222,128,.1);color:var(--green)}
+.tick-dn{background:rgba(248,113,113,.1);color:var(--red)}
+
+/* ── HERO ── */
+.hero{padding:20px 16px 16px;border-bottom:1px solid var(--b1);background:linear-gradient(180deg,var(--s1) 0%,var(--bg) 100%)}
+.hero h1{font-family:'DM Serif Display',serif;font-size:26px;font-weight:400;letter-spacing:-.4px;line-height:1.15}
+.hero h1 em{color:var(--gold);font-style:italic}
+.hero-sub{font-size:12px;color:var(--t3);margin-top:5px;line-height:1.65}
+.hero-badges{display:flex;gap:5px;flex-wrap:wrap;margin-top:10px}
+.hbadge{font-size:9px;padding:3px 9px;border-radius:3px;font-weight:700;border:.5px solid transparent;letter-spacing:.04em;text-transform:uppercase}
+.hbadge.g{background:var(--gold-dim);color:var(--gold);border-color:var(--gold-border)}
+.hbadge.gr{background:rgba(74,222,128,.08);color:var(--green);border-color:rgba(74,222,128,.2)}
+.hbadge.b{background:rgba(96,165,250,.08);color:var(--blue);border-color:rgba(96,165,250,.2)}
+.demo-strip{background:rgba(251,146,60,.06);border:.5px solid rgba(251,146,60,.2);border-radius:8px;padding:7px 12px;font-size:11px;color:var(--orange);margin-top:10px;display:flex;align-items:center;gap:6px}
+
+/* ── TABS ── */
+.tab-row{display:flex;gap:0;border-bottom:1px solid var(--b1);background:var(--bg);position:sticky;top:48px;z-index:200;backdrop-filter:blur(14px)}
+.tab{flex:1;padding:11px 6px;border:none;background:transparent;color:var(--t3);font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;letter-spacing:.04em;text-transform:uppercase;border-bottom:2px solid transparent}
+.tab.act{color:var(--gold);border-bottom-color:var(--gold)}
+
+/* ── SECTION ── */
+.sec{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);padding:0 16px;margin:14px 0 9px;display:flex;align-items:center;gap:8px}
+.sec::after{content:'';flex:1;height:.5px;background:var(--b1)}
+
+/* ── HEALTH SCORE ── */
+.score-panel{margin:0 16px;background:var(--s1);border:.5px solid var(--gold-border);border-radius:18px;padding:18px;display:flex;align-items:center;gap:18px}
+.score-ring{position:relative;width:88px;height:88px;flex-shrink:0}
+.score-ring svg{transform:rotate(-90deg)}
+.score-ring-bg{fill:none;stroke:var(--b2);stroke-width:7}
+.score-ring-fill{fill:none;stroke:var(--gold);stroke-width:7;stroke-linecap:round;transition:stroke-dashoffset .8s ease}
+.score-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.score-val{font-family:'DM Serif Display',serif;font-size:26px;line-height:1;color:var(--gold)}
+.score-max{font-size:9px;color:var(--t3)}
+.score-right{flex:1}
+.score-title{font-size:14px;font-weight:700;color:var(--t1);margin-bottom:4px}
+.score-grade{font-size:11px;color:var(--gold);font-weight:600;margin-bottom:8px}
+.score-bars{display:flex;flex-direction:column;gap:5px}
+.sbar-row{display:flex;align-items:center;gap:8px}
+.sbar-lbl{font-size:10px;color:var(--t3);width:80px;flex-shrink:0}
+.sbar-track{flex:1;height:4px;background:var(--b2);border-radius:2px;overflow:hidden}
+.sbar-fill{height:100%;border-radius:2px;transition:width .7s ease}
+.sbar-val{font-size:10px;color:var(--t2);width:28px;text-align:right;flex-shrink:0;font-family:'Courier Prime',monospace}
+
+/* ── KPI GRID ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:0 16px}
+.kpi-card{background:var(--s1);border:.5px solid var(--b1);border-radius:14px;padding:13px;animation:fadeUp .35s ease both;transition:border-color .15s}
+.kpi-card:hover{border-color:var(--b2)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.kpi-label{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:7px}
+.kpi-val{font-family:'DM Serif Display',serif;font-size:26px;line-height:1;margin-bottom:3px}
+.kpi-sub{font-size:11px;color:var(--t3);line-height:1.5}
+.kpi-bar{height:3px;border-radius:2px;margin-top:8px;overflow:hidden;background:var(--b2)}
+.kpi-bar-fill{height:100%;border-radius:2px}
+
+/* ── CASHFLOW ── */
+.cashflow-card{margin:0 16px;background:var(--s1);border:.5px solid var(--b1);border-radius:16px;overflow:hidden}
+.cf-hdr{padding:12px 14px;border-bottom:.5px solid var(--b1);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t3)}
+.cf-row{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-bottom:.5px solid var(--b1)}
+.cf-row:last-child{border-bottom:none}
+.cf-row.total{background:var(--s2)}
+.cf-label{font-size:13px;color:var(--t2);display:flex;align-items:center;gap:7px}
+.cf-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.cf-val{font-family:'Courier Prime',monospace;font-size:13px;font-weight:700}
+.cf-val.pos{color:var(--green)}
+.cf-val.neg{color:var(--red)}
+.cf-val.gold{color:var(--gold)}
+
+/* ── MARKETS TAB ── */
+.markets-wrap{padding:0 16px}
+.market-refresh{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.market-refresh-note{font-size:11px;color:var(--t3);font-family:'Courier Prime',monospace}
+.refresh-btn{font-size:11px;padding:6px 14px;border-radius:8px;border:.5px solid var(--gold-border);background:var(--gold-dim);color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:700;transition:all .15s}
+.refresh-btn:hover{opacity:.8}
+.refresh-btn:disabled{opacity:.4;cursor:not-allowed}
+.market-card{background:var(--s1);border:.5px solid var(--b1);border-radius:14px;overflow:hidden;margin-bottom:9px;animation:fadeUp .35s ease both}
+.mc-hdr{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;border-bottom:.5px solid var(--b1);background:var(--s2)}
+.mc-title{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t2);display:flex;align-items:center;gap:7px}
+.mc-ico{font-size:14px}
+.mc-time{font-family:'Courier Prime',monospace;font-size:9px;color:var(--t3)}
+.mc-body{padding:12px 13px;font-size:13px;color:var(--t2);line-height:1.8;white-space:pre-wrap}
+.mc-loading{display:flex;gap:5px;padding:12px 13px;align-items:center}
+.mc-loading span{font-size:12px;color:var(--t3)}
+
+/* ── INSIGHTS TAB ── */
+.insights-wrap{padding:0 16px}
+.insight-gen-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.insight-note{font-size:11px;color:var(--t3);line-height:1.5}
+.gen-btn{padding:8px 16px;border-radius:8px;border:.5px solid var(--gold-border);background:var(--gold-dim);color:var(--gold);font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:all .15s;flex-shrink:0}
+.gen-btn:disabled{opacity:.4;cursor:not-allowed}
+.insight-card{background:var(--s1);border:.5px solid var(--b1);border-radius:16px;overflow:hidden;margin-bottom:9px;animation:fadeUp .35s ease both}
+.insight-hdr{display:flex;align-items:center;gap:10px;padding:12px 13px;border-bottom:.5px solid var(--b1)}
+.insight-ico{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.insight-title{font-size:13px;font-weight:700;color:var(--t1)}
+.insight-category{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
+.insight-body{padding:12px 13px;font-size:13px;color:var(--t2);line-height:1.8}
+.insight-action{padding:9px 13px;border-top:.5px solid var(--b1);background:var(--s2);font-size:11px;color:var(--gold);display:flex;align-items:center;gap:6px}
+
+/* ── ADVISOR CHAT ── */
+.chat-outer{padding:0 16px}
+.chat-wrap{background:var(--s1);border:.5px solid var(--b1);border-radius:18px;overflow:hidden}
+.chat-msgs{display:flex;flex-direction:column;gap:8px;padding:14px;min-height:220px;max-height:420px;overflow-y:auto}
+.bubble{padding:11px 14px;border-radius:14px;font-size:13px;line-height:1.75;white-space:pre-wrap;word-break:break-word;animation:fadeUp .3s ease}
+.bubble.ai{background:var(--s2);border:.5px solid var(--b1);border-radius:4px 14px 14px 14px;color:var(--t2)}
+.bubble.user{background:linear-gradient(135deg,var(--gold2),var(--gold3));color:#fff;border-radius:14px 4px 14px 14px;align-self:flex-end;max-width:88%}
+.typing-dots{display:flex;gap:4px;padding:11px 14px;align-self:flex-start}
+.typing-dots span{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:dot 1.2s ease-in-out infinite;opacity:.4}
+.typing-dots span:nth-child(2){animation-delay:.2s}.typing-dots span:nth-child(3){animation-delay:.4s}
+@keyframes dot{0%,80%,100%{transform:scale(.7);opacity:.4}40%{transform:scale(1.1);opacity:1}}
+.chat-chips{display:flex;flex-wrap:wrap;gap:5px;padding:8px 13px;border-top:.5px solid var(--b1);overflow-x:auto}
+.chat-chips::-webkit-scrollbar{display:none}
+.chip{font-size:10px;padding:5px 11px;border-radius:99px;border:.5px solid var(--b2);background:var(--s2);color:var(--t2);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;white-space:nowrap;flex-shrink:0}
+.chip:hover{color:var(--gold);border-color:var(--gold-border)}
+.chat-input-row{display:flex;gap:8px;padding:10px 13px;border-top:.5px solid var(--b1);align-items:flex-end}
+.ta-wrap{flex:1;background:var(--s2);border:.5px solid var(--b2);border-radius:13px;display:flex;align-items:flex-end;transition:border-color .15s}
+.ta-wrap:focus-within{border-color:var(--gold-border)}
+.ta{flex:1;background:transparent;border:none;outline:none;color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;resize:none;line-height:1.5;padding:10px 12px;min-height:42px;max-height:110px;overflow-y:auto}
+.ta::placeholder{color:var(--t3)}
+.send-btn{width:38px;height:38px;border-radius:11px;border:none;background:linear-gradient(135deg,var(--gold2),var(--gold3));color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .15s;box-shadow:0 2px 12px rgba(212,152,32,.3)}
+.send-btn:hover{opacity:.85}
+.send-btn:disabled{background:var(--s3)!important;color:var(--t3);cursor:not-allowed;box-shadow:none}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--s2);border:.5px solid var(--b3);border-radius:12px;padding:10px 18px;font-size:12px;color:var(--t1);opacity:0;transition:all .3s;z-index:999;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── FOOTER ── */
+hr{border:none;border-top:.5px solid var(--b1);margin:24px 16px}
+.footer{text-align:center;padding:14px 20px 0;font-size:11px;color:var(--t3);line-height:2}
+
+/* ── LIGHT ── */
+[data-theme="light"] .chat-wrap,.bubble.ai{background:#fff}
+[data-theme="light"] .cashflow-card,.market-card,.insight-card,.kpi-card,.score-panel{background:#fff}
+[data-theme="light"] .bubble.ai{background:#fdf3d8;color:#6a5800}
+[data-theme="light"] .ta-wrap{background:#fdf3d8}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-left">
+    <div class="nav-title">Capital<em>Lens</em></div>
+    <div class="nav-tag">NZ FINANCIAL INTEL</div>
+  </div>
+  <div class="nav-right">
+    <a class="nav-back" href="apex.html">← Apex</a>
+    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
+  </div>
+</nav>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner" id="tickerInner"></div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>Capital<em>Lens</em> —<br>NZ Financial Intelligence</h1>
+  <div class="hero-sub">Live NZ market data, personalised financial health scoring, and an AI advisor that searches current NZ rates before every answer.</div>
+  <div class="hero-badges">
+    <span class="hbadge g">Claude API</span>
+    <span class="hbadge gr">Web Search</span>
+    <span class="hbadge b">NZ Context</span>
+  </div>
+  <div class="demo-strip">📋 Portfolio demo — realistic NZ financial profile. Connecting real bank or KiwiSaver accounts to a public site isn't appropriate, so the agent runs on a representative dataset. Live market data (mortgage rates, OCR, KiwiSaver returns) is fetched in real time.</div>
+</div>
+
+<!-- TABS -->
+<div class="tab-row">
+  <button class="tab act" id="tabDashboard" onclick="switchTab('dashboard')">Dashboard</button>
+  <button class="tab" id="tabMarkets" onclick="switchTab('markets')">Markets</button>
+  <button class="tab" id="tabInsights" onclick="switchTab('insights')">Insights</button>
+  <button class="tab" id="tabAdvisor" onclick="switchTab('advisor')">Advisor</button>
+</div>
+
+<!-- DASHBOARD TAB -->
+<div id="viewDashboard">
+  <div class="sec">Financial Health Score</div>
+  <div class="score-panel">
+    <div class="score-ring">
+      <svg width="88" height="88" viewBox="0 0 88 88">
+        <circle class="score-ring-bg" cx="44" cy="44" r="37"/>
+        <circle class="score-ring-fill" id="scoreCircle" cx="44" cy="44" r="37" stroke-dasharray="232.5" stroke-dashoffset="64.5"/>
+      </svg>
+      <div class="score-num">
+        <div class="score-val">72</div>
+        <div class="score-max">/100</div>
+      </div>
+    </div>
+    <div class="score-right">
+      <div class="score-title">Financial Health</div>
+      <div class="score-grade">Good — Room to optimise</div>
+      <div class="score-bars">
+        <div class="sbar-row">
+          <div class="sbar-lbl">Cash flow</div>
+          <div class="sbar-track"><div class="sbar-fill" style="width:80%;background:var(--green)"></div></div>
+          <div class="sbar-val">80</div>
+        </div>
+        <div class="sbar-row">
+          <div class="sbar-lbl">Savings rate</div>
+          <div class="sbar-track"><div class="sbar-fill" style="width:68%;background:var(--gold)"></div></div>
+          <div class="sbar-val">68</div>
+        </div>
+        <div class="sbar-row">
+          <div class="sbar-lbl">Debt ratio</div>
+          <div class="sbar-track"><div class="sbar-fill" style="width:70%;background:var(--gold)"></div></div>
+          <div class="sbar-val">70</div>
+        </div>
+        <div class="sbar-row">
+          <div class="sbar-lbl">Goal progress</div>
+          <div class="sbar-track"><div class="sbar-fill" style="width:58%;background:var(--orange)"></div></div>
+          <div class="sbar-val">58</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">Key metrics</div>
+  <div class="kpi-grid">
+    <div class="kpi-card" style="animation-delay:.05s">
+      <div class="kpi-label">Monthly surplus</div>
+      <div class="kpi-val" style="color:var(--green)">$2,380</div>
+      <div class="kpi-sub">After all expenses</div>
+      <div class="kpi-bar"><div class="kpi-bar-fill" style="width:72%;background:var(--green)"></div></div>
+    </div>
+    <div class="kpi-card" style="animation-delay:.1s">
+      <div class="kpi-label">KiwiSaver balance</div>
+      <div class="kpi-val" style="color:var(--gold)">$34,200</div>
+      <div class="kpi-sub">Growth fund · 3% contrib</div>
+      <div class="kpi-bar"><div class="kpi-bar-fill" style="width:58%;background:var(--gold)"></div></div>
+    </div>
+    <div class="kpi-card" style="animation-delay:.15s">
+      <div class="kpi-label">House deposit</div>
+      <div class="kpi-val" style="color:var(--blue)">$48,600</div>
+      <div class="kpi-sub">Goal $120K · 40.5%</div>
+      <div class="kpi-bar"><div class="kpi-bar-fill" style="width:40.5%;background:var(--blue)"></div></div>
+    </div>
+    <div class="kpi-card" style="animation-delay:.2s">
+      <div class="kpi-label">Net worth</div>
+      <div class="kpi-val" style="color:var(--teal)">$82,800</div>
+      <div class="kpi-sub">↑ $2,380 this month</div>
+      <div class="kpi-bar"><div class="kpi-bar-fill" style="width:65%;background:var(--teal)"></div></div>
+    </div>
+  </div>
+
+  <div class="sec">Monthly cash flow</div>
+  <div class="cashflow-card">
+    <div class="cf-hdr">Income vs Expenses · May 2026</div>
+    <div class="cf-row">
+      <div class="cf-label"><div class="cf-dot" style="background:var(--green)"></div>Take-home salary</div>
+      <div class="cf-val pos">+$6,200</div>
+    </div>
+    <div class="cf-row">
+      <div class="cf-label"><div class="cf-dot" style="background:var(--red)"></div>Rent</div>
+      <div class="cf-val neg">-$1,800</div>
+    </div>
+    <div class="cf-row">
+      <div class="cf-label"><div class="cf-dot" style="background:var(--red)"></div>Living expenses</div>
+      <div class="cf-val neg">-$1,200</div>
+    </div>
+    <div class="cf-row">
+      <div class="cf-label"><div class="cf-dot" style="background:var(--red)"></div>Bills & subscriptions</div>
+      <div class="cf-val neg">-$420</div>
+    </div>
+    <div class="cf-row">
+      <div class="cf-label"><div class="cf-dot" style="background:var(--orange)"></div>KiwiSaver (3%)</div>
+      <div class="cf-val neg">-$200</div>
+    </div>
+    <div class="cf-row total">
+      <div class="cf-label" style="font-weight:700;color:var(--t1)"><div class="cf-dot" style="background:var(--gold)"></div>Net surplus</div>
+      <div class="cf-val gold">+$2,380</div>
+    </div>
+  </div>
+
+  <div class="sec">Property deposit progress</div>
+  <div class="cashflow-card" style="margin:0 16px">
+    <div class="cf-hdr">First Home Goal · Target $120,000</div>
+    <div class="cf-row">
+      <div class="cf-label"><div class="cf-dot" style="background:var(--blue)"></div>Current savings</div>
+      <div class="cf-val" style="color:var(--blue)">$48,600</div>
+    </div>
+    <div class="cf-row">
+      <div class="cf-label"><div class="cf-dot" style="background:var(--teal)"></div>KiwiSaver (eligible)</div>
+      <div class="cf-val" style="color:var(--teal)">$34,200</div>
+    </div>
+    <div class="cf-row">
+      <div class="cf-label"><div class="cf-dot" style="background:var(--green)"></div>HomeStart grant est.</div>
+      <div class="cf-val" style="color:var(--green)">$10,000</div>
+    </div>
+    <div class="cf-row total">
+      <div class="cf-label" style="font-weight:700;color:var(--t1)"><div class="cf-dot" style="background:var(--gold)"></div>Combined total</div>
+      <div class="cf-val gold">$92,800 / $120K</div>
+    </div>
+    <div style="padding:10px 14px">
+      <div style="height:6px;background:var(--b2);border-radius:3px;overflow:hidden">
+        <div style="width:77.3%;height:100%;background:linear-gradient(90deg,var(--gold2),var(--gold));border-radius:3px;transition:width .8s ease"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:5px">
+        <span style="font-size:10px;color:var(--t3)">77.3% of goal</span>
+        <span style="font-size:10px;color:var(--gold);font-family:'Courier Prime',monospace" id="depositMonths">calculating…</span>
+      </div>
+    </div>
+  </div>
+  <hr>
+  <div class="footer">CapitalLens · NZ Financial Intelligence · Built by Miten Chauhan<br><span style="color:var(--gold)">◈</span> Part of the Apex AI Stack · <a href="https://miten.co.nz" style="color:var(--t2);text-decoration:none">miten.co.nz</a></div>
+</div>
+
+<!-- MARKETS TAB -->
+<div id="viewMarkets" style="display:none">
+  <div class="markets-wrap">
+    <div class="market-refresh">
+      <div class="market-refresh-note" id="marketTime">Not fetched yet</div>
+      <button class="refresh-btn" id="marketRefreshBtn" onclick="fetchMarkets()">↻ Fetch live data</button>
+    </div>
+    <div id="marketCards"></div>
+    <hr>
+    <div class="footer">CapitalLens · NZ Financial Intelligence · Built by Miten Chauhan<br><span style="color:var(--gold)">◈</span> Part of the Apex AI Stack · <a href="https://miten.co.nz" style="color:var(--t2);text-decoration:none">miten.co.nz</a></div>
+  </div>
+</div>
+
+<!-- INSIGHTS TAB -->
+<div id="viewInsights" style="display:none">
+  <div class="insights-wrap">
+    <div class="insight-gen-row">
+      <div class="insight-note">Claude searches live NZ financial data<br>then generates personalised insights.</div>
+      <button class="gen-btn" id="insightsBtn" onclick="generateInsights()">Generate ✦</button>
+    </div>
+    <div id="insightCards">
+      <div style="text-align:center;padding:40px 0;color:var(--t3)">
+        <div style="font-size:32px;margin-bottom:12px;opacity:.4">◈</div>
+        <div style="font-size:14px;color:var(--t2);margin-bottom:6px">No insights yet</div>
+        <div style="font-size:12px">Hit Generate to get personalised NZ financial insights.</div>
+      </div>
+    </div>
+    <hr>
+    <div class="footer">CapitalLens · NZ Financial Intelligence · Built by Miten Chauhan<br><span style="color:var(--gold)">◈</span> Part of the Apex AI Stack · <a href="https://miten.co.nz" style="color:var(--t2);text-decoration:none">miten.co.nz</a></div>
+  </div>
+</div>
+
+<!-- ADVISOR TAB -->
+<div id="viewAdvisor" style="display:none">
+  <div class="sec">NZ Financial Advisor</div>
+  <div class="chat-outer">
+    <div class="chat-wrap">
+      <div class="chat-msgs" id="chatMsgs">
+        <div class="bubble ai">Kia ora Miten 👋 I'm CapitalLens — your NZ financial intelligence agent. I search for live NZ rates and data before every answer — mortgage rates, KiwiSaver rules, property prices, OCR decisions. Ask me anything about your financial picture.</div>
+      </div>
+      <div class="chat-chips" id="chatChips"></div>
+      <div class="chat-input-row">
+        <div class="ta-wrap">
+          <textarea class="ta" id="chatInput" placeholder="Should I fix or float my mortgage? How do I maximise KiwiSaver?…" rows="1" onkeydown="chatKey(event)" oninput="autoResize(this)"></textarea>
+        </div>
+        <button class="send-btn" id="sendBtn" onclick="sendChat()">↑</button>
+      </div>
+    </div>
+  </div>
+  <hr>
+  <div class="footer">CapitalLens · NZ Financial Intelligence · Built by Miten Chauhan<br><span style="color:var(--gold)">◈</span> Part of the Apex AI Stack · <a href="https://miten.co.nz" style="color:var(--t2);text-decoration:none">miten.co.nz</a></div>
+</div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const API_URL = 'https://nexus-api.mitenchauhan08.workers.dev';
+
+/* ── DEMO PROFILE ── */
+const PROFILE = `MITEN'S NZ FINANCIAL PROFILE (demo — realistic NZ numbers):
+- Location: Wellington, New Zealand
+- Age: 26, single, renting
+- Take-home salary: $6,200/month (~$95K gross)
+- KiwiSaver: $34,200 in growth fund, 3% contribution, employer 3% match
+- Savings account: $48,600 (house deposit fund, high-interest savings)
+- Monthly rent: $1,800
+- Monthly living expenses: ~$1,200
+- Monthly bills/subscriptions: ~$420
+- Monthly net surplus: ~$2,380
+- Net worth: ~$82,800
+- Goal 1: First home deposit $120K (77.3% of the way)
+- Goal 2: Grow KiwiSaver to maximise first home withdrawal
+- Goal 3: Understand fix vs float mortgage decision
+- No credit card debt, student loan nearly paid off (~$3K remaining)
+- Financial health score: 72/100`;
+
+const ADVISOR_SYS = `You are CapitalLens, a New Zealand financial intelligence agent. You search for live NZ financial data before every answer — current mortgage rates, RBNZ OCR, KiwiSaver fund returns, house prices, inflation data. Always apply your answer to Miten's specific NZ financial profile below. Be direct, use NZ-specific context (KiwiSaver, HomeStart, IRD, RBNZ), and give practical actionable advice. Never give generic advice — always tie it to the numbers.\n\n${PROFILE}`;
+
+const CHIPS = [
+  'Should I fix or float my mortgage?',
+  'How do I maximise my KiwiSaver?',
+  'When can I use KiwiSaver for first home?',
+  'Is $120K enough for a Wellington deposit?',
+  'What is the OCR doing to rates?',
+  'How much house can I afford right now?',
+];
+
+const MARKET_QUERIES = [
+  { id: 'ocr', icon: '🏦', title: 'RBNZ OCR & Rate Outlook', query: 'RBNZ OCR current rate 2026 New Zealand interest rate decision' },
+  { id: 'mortgage', icon: '🏠', title: 'NZ Mortgage Rates', query: 'New Zealand mortgage rates 1 year 2 year fixed floating May 2026' },
+  { id: 'kiwisaver', icon: '💼', title: 'KiwiSaver Returns', query: 'KiwiSaver growth fund returns 2025 2026 New Zealand performance' },
+  { id: 'property', icon: '📊', title: 'Wellington Property Market', query: 'Wellington Auckland NZ property house prices median May 2026' },
+];
+
+const INSIGHT_PROMPTS = [
+  { icon: '🏠', cat: 'Property', q: 'Based on Miten\'s NZ financial profile, is now a good time to buy in Wellington? Search for current Wellington house prices and mortgage rates, then give a specific insight and action step.' },
+  { icon: '💼', cat: 'KiwiSaver', q: 'Search for current KiwiSaver growth fund returns and contribution rules in NZ 2026. Then give Miten a specific insight about whether his 3% contribution is optimal and what he should do.' },
+  { icon: '📈', cat: 'Savings Rate', q: 'Search for NZ high-interest savings account rates May 2026. Then give Miten a specific insight about whether his $2,380 monthly surplus is being deployed optimally.' },
+];
+
+let chatHistory = [];
+let chatBusy = false;
+
+/* ── TICKER ── */
+const TICKS = [
+  { label:'NZD/USD', val:'0.5914', chg:'+0.12%', up:true },
+  { label:'NZX 50', val:'12,847', chg:'+0.34%', up:true },
+  { label:'OCR', val:'3.25%', chg:'-25bps', up:false },
+  { label:'CPI', val:'2.5%', chg:'↓ trend', up:true },
+  { label:'ASB 1YR FIX', val:'5.79%', chg:'-10bps', up:false },
+  { label:'ANZ 2YR FIX', val:'5.49%', chg:'-15bps', up:false },
+  { label:'MEDIAN WLG', val:'$695K', chg:'-2.1%', up:false },
+  { label:'NZD/AUD', val:'0.9021', chg:'+0.08%', up:true },
+  { label:'⚠ DEMO DATA', val:'use Markets tab', chg:'for live rates', up:true },
+];
+
+function renderTicker() {
+  const inner = document.getElementById('tickerInner');
+  const html = TICKS.map(t =>
+    `<div class="tick-item">
+      <span class="tick-label">${t.label}</span>
+      <span class="tick-val">${t.val}</span>
+      <span class="tick-chg ${t.up ? 'tick-up' : 'tick-dn'}">${t.chg}</span>
+    </div>`
+  ).join('');
+  inner.innerHTML = html + html;
+
+  // Dynamic deposit timeline
+  const remaining = 120000 - 92800; // $27,200 remaining
+  const monthlySurplus = 2380;
+  const monthsLeft = Math.ceil(remaining / monthlySurplus);
+  const el = document.getElementById('depositMonths');
+  if (el) el.textContent = `~${monthsLeft} months to go`;
+}
+
+/* ── THEME ── */
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('themeBtn').textContent = isDark ? '☀️' : '🌙';
+}
+
+/* ── TABS ── */
+function switchTab(t) {
+  ['dashboard','markets','insights','advisor'].forEach(v => {
+    document.getElementById('view' + v.charAt(0).toUpperCase() + v.slice(1)).style.display = v === t ? '' : 'none';
+    document.getElementById('tab' + v.charAt(0).toUpperCase() + v.slice(1)).classList.toggle('act', v === t);
+  });
+}
+
+/* ── MARKETS ── */
+async function fetchMarkets() {
+  const btn = document.getElementById('marketRefreshBtn');
+  const cards = document.getElementById('marketCards');
+  const timeEl = document.getElementById('marketTime');
+  btn.disabled = true;
+  btn.textContent = 'Fetching…';
+
+  cards.innerHTML = MARKET_QUERIES.map(q =>
+    `<div class="market-card" id="mc-${q.id}">
+      <div class="mc-hdr">
+        <div class="mc-title"><span class="mc-ico">${q.icon}</span>${q.title}</div>
+        <div class="mc-time">Loading…</div>
+      </div>
+      <div class="mc-loading"><span class="spinner" style="display:inline-block;width:10px;height:10px;border:1.5px solid var(--b2);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;margin-right:5px"></span><span>Searching live NZ data…</span></div>
+    </div>`
+  ).join('');
+
+  const now = new Date();
+  timeEl.textContent = `Last fetched: ${now.toLocaleTimeString('en-NZ', { hour: '2-digit', minute: '2-digit' })}`;
+
+  for (const q of MARKET_QUERIES) {
+    try {
+      const resp = await fetch(API_URL, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-5', max_tokens: 250,
+          system: 'You are a NZ financial data agent. Search for the requested data and return a clear, concise 2-3 paragraph summary of current numbers and trend. Use specific figures where found. No preamble — start with the data.',
+          messages: [{ role: 'user', content: q.query }],
+          tools: [{ type: 'web_search_20250305', name: 'web_search' }]
+        })
+      });
+      const data = await resp.json();
+      const text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('') || 'No data found.';
+      const card = document.getElementById(`mc-${q.id}`);
+      if (card) {
+        card.querySelector('.mc-time').textContent = now.toLocaleTimeString('en-NZ', { hour: '2-digit', minute: '2-digit' });
+        card.querySelector('.mc-loading').outerHTML = `<div class="mc-body">${text}</div>`;
+      }
+    } catch {
+      const card = document.getElementById(`mc-${q.id}`);
+      if (card) card.querySelector('.mc-loading').outerHTML = `<div class="mc-body" style="color:var(--t3)">Could not fetch data. Check connection.</div>`;
+    }
+  }
+
+  btn.disabled = false;
+  btn.textContent = '↻ Refresh';
+}
+
+/* ── INSIGHTS ── */
+async function generateInsights() {
+  const btn = document.getElementById('insightsBtn');
+  const cards = document.getElementById('insightCards');
+  btn.disabled = true;
+  btn.textContent = 'Generating…';
+
+  cards.innerHTML = INSIGHT_PROMPTS.map((p, i) =>
+    `<div class="insight-card" id="ins-${i}" style="animation-delay:${i*0.08}s">
+      <div class="insight-hdr">
+        <div class="insight-ico" style="background:var(--gold-dim);color:var(--gold)">${p.icon}</div>
+        <div><div class="insight-title">Generating ${p.cat} insight…</div><div class="insight-category">${p.cat}</div></div>
+      </div>
+      <div class="insight-body"><div class="typing-dots"><span></span><span></span><span></span></div></div>
+    </div>`
+  ).join('');
+
+  for (let i = 0; i < INSIGHT_PROMPTS.length; i++) {
+    const p = INSIGHT_PROMPTS[i];
+    try {
+      const resp = await fetch(API_URL, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-5', max_tokens: 300,
+          system: `You are CapitalLens, a NZ financial intelligence agent. Search for live NZ data, then give a specific, personalised financial insight for Miten. Structure: 1) One sentence headline insight 2) 2-3 sentences of supporting detail with specific NZ numbers 3) One clear action step starting with "Action:". Be direct and NZ-specific.\n\n${PROFILE}`,
+          messages: [{ role: 'user', content: p.q }],
+          tools: [{ type: 'web_search_20250305', name: 'web_search' }]
+        })
+      });
+      const data = await resp.json();
+      const text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('') || 'Could not generate insight.';
+      const lines = text.split('\n').filter(Boolean);
+      const action = lines.find(l => l.startsWith('Action:')) || '';
+      const body = lines.filter(l => !l.startsWith('Action:')).join('\n');
+
+      const card = document.getElementById(`ins-${i}`);
+      if (card) {
+        card.querySelector('.insight-title').textContent = lines[0] || `${p.cat} Insight`;
+        card.querySelector('.insight-body').textContent = body;
+        if (action) {
+          const existingAction = card.querySelector('.insight-action');
+          if (!existingAction) {
+            const actionEl = document.createElement('div');
+            actionEl.className = 'insight-action';
+            actionEl.innerHTML = `<span style="font-size:12px">→</span> ${action}`;
+            card.appendChild(actionEl);
+          }
+        }
+      }
+    } catch {
+      const card = document.getElementById(`ins-${i}`);
+      if (card) card.querySelector('.insight-body').textContent = 'Could not generate insight. Check API connection.';
+    }
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Regenerate ✦';
+}
+
+/* ── CHAT ── */
+function renderChips() {
+  document.getElementById('chatChips').innerHTML = CHIPS.map(c =>
+    `<button class="chip" onclick="chipSend('${c.replace(/'/g, "\\'")}')">${c}</button>`
+  ).join('');
+}
+
+function chipSend(msg) { document.getElementById('chatInput').value = msg; sendChat(); }
+function chatKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); } }
+function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 110) + 'px'; }
+
+function appendBubble(text, cls) {
+  const msgs = document.getElementById('chatMsgs');
+  const div = document.createElement('div');
+  div.className = `bubble ${cls}`;
+  div.textContent = text;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function showTyping() {
+  const msgs = document.getElementById('chatMsgs');
+  const d = document.createElement('div');
+  d.className = 'typing-dots'; d.id = 'typingDots';
+  d.innerHTML = '<span></span><span></span><span></span>';
+  msgs.appendChild(d);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function removeTyping() { const d = document.getElementById('typingDots'); if(d) d.remove(); }
+
+async function sendChat() {
+  if (chatBusy) return;
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = ''; input.style.height = 'auto';
+  document.getElementById('sendBtn').disabled = true;
+  chatBusy = true;
+  appendBubble(msg, 'user');
+  chatHistory.push({ role: 'user', content: msg });
+  showTyping();
+
+  try {
+    const resp = await fetch(API_URL, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5', max_tokens: 500,
+        system: ADVISOR_SYS,
+        messages: chatHistory,
+        tools: [{ type: 'web_search_20250305', name: 'web_search' }]
+      })
+    });
+    const data = await resp.json();
+    const reply = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('') || 'No response. Try again.';
+    removeTyping();
+    appendBubble(reply, 'ai');
+    chatHistory.push({ role: 'assistant', content: reply });
+    if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20);
+  } catch(e) {
+    removeTyping();
+    appendBubble('⚠️ Connection issue or rate limit — please wait and try again.', 'ai');
+  }
+
+  chatBusy = false;
+  document.getElementById('sendBtn').disabled = false;
+}
+
+/* ── TOAST ── */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* ── INIT ── */
+renderTicker();
+renderChips();
+</script>
+</body>
+</html>

@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="description" content="Cortex — Miten's Second Brain. Save ideas, links and notes. Claude auto-tags and connects them. Chat your own knowledge.">
+<title>Cortex — Miten's Second Brain</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+
+[data-theme="dark"]{
+  --bg:#0c0c0f;--s1:#141418;--s2:#1a1a1f;--s3:#222228;
+  --b1:rgba(255,255,255,.06);--b2:rgba(255,255,255,.12);
+  --t1:#f0eeea;--t2:#9a9895;--t3:#55524f;
+  --green:#c9f06e;--blue:#6eaff0;--orange:#f0a56e;--purple:#c46ef0;--teal:#6ef0d4;--red:#f06e6e;--pink:#f06eb4;
+  --nav-bg:rgba(12,12,15,.92);
+  --accent:var(--purple);
+}
+[data-theme="light"]{
+  --bg:#f4f4f0;--s1:#fff;--s2:#f0f0eb;--s3:#e4e4de;
+  --b1:rgba(0,0,0,.07);--b2:rgba(0,0,0,.13);
+  --t1:#1a1a18;--t2:#5a5a55;--t3:#9a9a90;
+  --green:#4a8000;--blue:#1a5fb4;--orange:#b35c00;--purple:#6b3fa0;--teal:#0a6e6e;--red:#b03030;--pink:#a03070;
+  --nav-bg:rgba(244,244,240,.92);
+  --accent:var(--purple);
+}
+
+html,body{min-height:100%;background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;transition:background .25s,color .25s}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px}
+.app{max-width:680px;margin:0 auto;padding:0 0 80px}
+
+/* NAV */
+.nav{display:flex;justify-content:space-between;align-items:center;padding:11px 16px;border-bottom:1px solid var(--b1);background:var(--nav-bg);backdrop-filter:blur(14px);position:sticky;top:0;z-index:200;transition:background .25s}
+.nav-title{font-family:'DM Serif Display',serif;font-size:16px}.nav-title em{color:var(--purple);font-style:italic}
+.nav-right{display:flex;gap:8px;align-items:center}
+.nav-back{font-size:11px;color:var(--t3);text-decoration:none;padding:5px 10px;border-radius:6px;border:1px solid var(--b1);background:var(--s2);transition:all .15s}
+.nav-back:hover{color:var(--t1)}
+.theme-btn{width:30px;height:30px;border-radius:7px;border:1px solid var(--b1);background:var(--s2);color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .15s}
+.theme-btn:hover{border-color:var(--purple);color:var(--purple)}
+
+/* HERO */
+.hero{padding:22px 16px 18px;border-bottom:1px solid var(--b1);background:var(--bg)}
+.hero h1{font-family:'DM Serif Display',serif;font-size:28px;font-weight:400;letter-spacing:-.4px;line-height:1.1}
+.hero h1 em{color:var(--purple);font-style:italic}
+.hero-meta{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap}
+.hero-sub{font-size:11px;color:var(--t3)}
+.hbadge{font-size:9px;padding:4px 9px;border-radius:99px;font-weight:500;border:.5px solid transparent}
+.hbadge.p{background:rgba(196,110,240,.1);color:var(--purple);border-color:rgba(196,110,240,.2)}
+.hbadge.t{background:rgba(110,240,212,.1);color:var(--teal);border-color:rgba(110,240,212,.2)}
+.hbadge.b{background:rgba(110,175,240,.1);color:var(--blue);border-color:rgba(110,175,240,.2)}
+
+/* STATS BAR */
+.stats-bar{display:flex;gap:0;border-bottom:1px solid var(--b1)}
+.stat{flex:1;padding:12px 16px;border-right:.5px solid var(--b1);text-align:center}
+.stat:last-child{border-right:none}
+.stat-val{font-family:'DM Serif Display',serif;font-size:22px;color:var(--t1)}
+.stat-lbl{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-top:2px}
+
+/* TABS */
+.tab-row{display:flex;gap:3px;padding:10px 16px;border-bottom:1px solid var(--b1);background:var(--bg);position:sticky;top:48px;z-index:100;backdrop-filter:blur(14px)}
+.tab{flex:1;padding:8px 10px;border-radius:10px;border:none;background:transparent;color:var(--t3);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif}
+.tab.act{background:var(--s2);color:var(--t1)}
+
+/* SEC */
+.sec{font-size:9px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);padding:0 16px;margin:14px 0 9px}
+
+/* SAVE PANEL */
+.save-panel{margin:0 16px;background:var(--s1);border:.5px solid var(--b1);border-radius:18px;overflow:hidden}
+.save-inner{padding:14px}
+.save-label{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:8px}
+.save-ta{width:100%;background:var(--s2);border:.5px solid var(--b2);border-radius:12px;color:var(--t1);font-family:'DM Sans',sans-serif;font-size:13px;padding:11px 13px;resize:none;outline:none;line-height:1.6;min-height:90px;transition:border-color .15s}
+.save-ta:focus{border-color:var(--purple)}
+.save-ta::placeholder{color:var(--t3)}
+.save-row{display:flex;align-items:center;justify-content:space-between;margin-top:10px;gap:8px}
+.type-chips{display:flex;gap:5px;flex-wrap:wrap}
+.type-chip{font-size:10px;padding:4px 10px;border-radius:99px;border:.5px solid var(--b1);background:var(--s2);color:var(--t3);cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif}
+.type-chip.sel{border-color:rgba(196,110,240,.4);background:rgba(196,110,240,.12);color:var(--purple)}
+.save-btn{height:36px;padding:0 18px;background:var(--purple);color:#fff;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:opacity .15s;flex-shrink:0}
+.save-btn:hover{opacity:.85}
+.save-btn:disabled{opacity:.4;cursor:not-allowed}
+.processing-bar{height:2px;background:var(--b1);border-radius:99px;overflow:hidden;margin-top:10px;display:none}
+.processing-fill{height:100%;width:0;background:var(--purple);border-radius:99px;transition:width .4s ease}
+
+/* NOTE CARDS */
+.notes-list{display:flex;flex-direction:column;gap:9px;padding:0 16px}
+.note-card{background:var(--s1);border:.5px solid var(--b1);border-radius:16px;overflow:hidden;animation:fadeUp .35s ease both;transition:border-color .15s}
+.note-card:hover{border-color:var(--b2)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.note-top{display:flex;align-items:flex-start;gap:10px;padding:13px 14px 10px}
+.note-type-ico{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.note-body{flex:1;min-width:0}
+.note-summary{font-size:13px;color:var(--t1);line-height:1.65;margin-bottom:7px}
+.note-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px}
+.ntag{font-size:9px;padding:2px 8px;border-radius:99px;font-weight:500}
+.note-meta{font-size:10px;color:var(--t3)}
+.note-connections{background:var(--s2);padding:8px 14px;display:flex;align-items:flex-start;gap:7px;border-top:.5px solid var(--b1)}
+.conn-label{font-size:9px;font-weight:600;letter-spacing:.06em;color:var(--purple);text-transform:uppercase;margin-bottom:2px;white-space:nowrap;padding-top:1px}
+.conn-text{font-size:11px;color:var(--t2);line-height:1.5}
+.note-actions{display:flex;gap:5px;padding:8px 14px;border-top:.5px solid var(--b1)}
+.nact-btn{font-size:10px;padding:4px 10px;border-radius:99px;border:.5px solid var(--b1);background:transparent;color:var(--t3);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.nact-btn:hover{color:var(--t1);border-color:var(--b2)}
+.nact-btn.del:hover{color:var(--red);border-color:rgba(240,110,110,.3)}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:48px 16px;color:var(--t3)}
+.empty-ico{font-size:36px;margin-bottom:12px;opacity:.4}
+.empty-title{font-size:14px;font-weight:500;color:var(--t2);margin-bottom:6px}
+.empty-sub{font-size:12px;line-height:1.6}
+
+/* CHAT */
+.chat-wrap{margin:0 16px;background:var(--s1);border:.5px solid var(--b1);border-radius:18px;overflow:hidden}
+.chat-msgs{display:flex;flex-direction:column;gap:8px;padding:14px;max-height:400px;overflow-y:auto;min-height:200px}
+.bubble{padding:10px 13px;border-radius:14px;font-size:13px;line-height:1.65;white-space:pre-wrap;word-break:break-word;animation:fadeUp .3s ease}
+.bubble.ai{background:var(--s2);border:.5px solid var(--b1);border-radius:4px 14px 14px 14px;color:var(--t2)}
+.bubble.user{background:rgba(196,110,240,.12);border:.5px solid rgba(196,110,240,.2);border-radius:14px 4px 14px 14px;color:var(--t1);align-self:flex-end;max-width:88%}
+.chat-chips{display:flex;flex-wrap:wrap;gap:5px;padding:8px 13px;border-top:.5px solid var(--b1)}
+.chat-chip{font-size:11px;padding:5px 11px;border-radius:99px;border:.5px solid var(--b1);background:var(--s2);color:var(--t2);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.chat-chip:hover{color:var(--purple);border-color:rgba(196,110,240,.3)}
+.chat-input-row{display:flex;gap:8px;padding:10px 13px;border-top:.5px solid var(--b1);align-items:flex-end}
+.ta-wrap{flex:1;background:var(--s2);border:.5px solid var(--b2);border-radius:12px;display:flex;align-items:flex-end}
+.ta{flex:1;background:transparent;border:none;outline:none;color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;resize:none;line-height:1.5;padding:10px 12px;min-height:42px;max-height:110px;overflow-y:auto}
+.ta::placeholder{color:var(--t3)}
+.send-btn{width:38px;height:38px;border-radius:10px;border:none;background:var(--purple);color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.send-btn:disabled{background:var(--s2)!important;color:var(--t3);cursor:not-allowed}
+.typing-dots{display:flex;gap:4px;padding:10px 13px;align-self:flex-start}
+.typing-dots span{width:6px;height:6px;border-radius:50%;background:var(--t3);animation:dot 1.2s ease-in-out infinite}
+.typing-dots span:nth-child(2){animation-delay:.2s}.typing-dots span:nth-child(3){animation-delay:.4s}
+@keyframes dot{0%,80%,100%{transform:scale(.7);opacity:.4}40%{transform:scale(1);opacity:1}}
+
+/* SEARCH */
+.search-row{padding:0 16px;margin-bottom:10px}
+.search-input{width:100%;height:38px;background:var(--s1);border:.5px solid var(--b2);border-radius:10px;color:var(--t1);font-family:'DM Sans',sans-serif;font-size:13px;padding:0 13px;outline:none;transition:border-color .15s}
+.search-input:focus{border-color:var(--purple)}
+.search-input::placeholder{color:var(--t3)}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--s1);border:.5px solid var(--b2);border-radius:12px;padding:10px 18px;font-size:12px;color:var(--t1);opacity:0;transition:all .3s;z-index:999;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* LIGHT OVERRIDES */
+[data-theme="light"] .save-ta{background:#f0f0eb;border-color:rgba(0,0,0,.15)}
+[data-theme="light"] .ta-wrap{background:#f0f0eb;border-color:rgba(0,0,0,.15)}
+[data-theme="light"] .ta{color:#1a1a18}
+[data-theme="light"] .ta::placeholder{color:#9a9a90}
+[data-theme="light"] .search-input{background:#fff;border-color:rgba(0,0,0,.15)}
+[data-theme="light"] .bubble.ai{background:#f0f0eb;color:#5a5a55}
+[data-theme="light"] .chat-chip{background:#f0f0eb;color:#5a5a55}
+[data-theme="light"] .note-card{background:#fff}
+[data-theme="light"] .save-panel{background:#fff}
+[data-theme="light"] .chat-wrap{background:#fff}
+
+hr{border:none;border-top:.5px solid var(--b1);margin:18px 16px}
+.footer{text-align:center;padding:18px 20px 0;font-size:11px;color:var(--t3);line-height:2}
+
+.ldot{width:5px;height:5px;border-radius:50%;background:#a855f7;display:inline-block;animation:glow 2s infinite;flex-shrink:0;margin-right:3px}
+@keyframes glow{0%,100%{opacity:.4}50%{opacity:1}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{display:inline-block;width:10px;height:10px;border:1.5px solid var(--b2);border-top-color:var(--purple);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:5px}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+<nav class="nav">
+  <div class="nav-title">Cortex — <em>Second Brain</em></div>
+  <div class="nav-right">
+    <a class="nav-back" href="apex.html">← Apex</a>
+    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
+  </div>
+</nav>
+
+<div class="hero">
+  <h1>Cortex —<br><em>your second brain</em></h1>
+  <div class="hero-meta">
+    <span class="hero-sub">Save anything. Claude tags it. Chat your knowledge.</span>
+    <span class="hbadge p">Claude API</span>
+    <span class="hbadge t">Persistent</span>
+    <span class="hbadge b">Semantic Search</span>
+  </div>
+</div>
+
+<div class="stats-bar">
+  <div class="stat"><div class="stat-val" id="statNotes">0</div><div class="stat-lbl">Memories</div></div>
+  <div class="stat"><div class="stat-val" id="statTags">0</div><div class="stat-lbl">Topics</div></div>
+  <div class="stat"><div class="stat-val" id="statConn">0</div><div class="stat-lbl">Connections</div></div>
+</div>
+
+<div class="tab-row">
+  <button class="tab act" id="tabSave" onclick="switchTab('save')">＋ Save</button>
+  <button class="tab" id="tabBrain" onclick="switchTab('brain')">🧠 Brain</button>
+  <button class="tab" id="tabChat" onclick="switchTab('chat')">💬 Chat</button>
+</div>
+
+<!-- SAVE TAB -->
+<div id="viewSave">
+  <div class="sec">Drop something in</div>
+  <div class="save-panel">
+    <div class="save-inner">
+      <div class="save-label">Note, idea, link, or quote</div>
+      <textarea class="save-ta" id="saveInput" placeholder="Paste a URL, write a thought, drop a quote… anything worth remembering." rows="4" oninput="onSaveInput()"></textarea>
+      <div class="save-row">
+        <div class="type-chips">
+          <button class="type-chip sel" data-type="idea" onclick="selType(this)">💡 Idea</button>
+          <button class="type-chip" data-type="link" onclick="selType(this)">🔗 Link</button>
+          <button class="type-chip" data-type="quote" onclick="selType(this)">💬 Quote</button>
+          <button class="type-chip" data-type="note" onclick="selType(this)">📝 Note</button>
+        </div>
+        <button class="save-btn" id="saveBtn" onclick="saveEntry()" disabled>Save →</button>
+      </div>
+      <div class="processing-bar" id="procBar">
+        <div class="processing-fill" id="procFill"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec" style="margin-top:18px">Recent memories</div>
+  <div class="notes-list" id="recentList"></div>
+</div>
+
+<!-- BRAIN TAB -->
+<div id="viewBrain" style="display:none">
+  <div class="sec">All memories</div>
+  <div class="search-row">
+    <input class="search-input" id="searchInput" placeholder="Filter by keyword or topic…" oninput="filterNotes()">
+  </div>
+  <div class="notes-list" id="allList"></div>
+</div>
+
+<!-- CHAT TAB -->
+<div id="viewChat" style="display:none">
+  <div class="sec" style="margin-bottom:0">Chat your brain</div>
+  <div class="chat-wrap">
+    <div class="chat-msgs" id="chatMsgs">
+      <div class="bubble ai">Hey Miten 👋 I'm your Cortex. Ask me anything about what you've saved — I'll search your brain first, not the web.</div>
+    </div>
+    <div class="chat-chips" id="chatChips">
+      <button class="chat-chip" onclick="chipSend('What have I saved recently?')">What have I saved recently?</button>
+      <button class="chat-chip" onclick="chipSend('What topics come up most?')">What topics come up most?</button>
+      <button class="chat-chip" onclick="chipSend('What ideas are connected?')">What ideas are connected?</button>
+    </div>
+    <div class="chat-input-row">
+      <div class="ta-wrap">
+        <textarea class="ta" id="chatInput" placeholder="Ask about your saved knowledge…" rows="1" onkeydown="chatKey(event)" oninput="autoResize(this)"></textarea>
+      </div>
+      <button class="send-btn" id="sendBtn" onclick="sendChat()">↑</button>
+    </div>
+  </div>
+</div>
+
+<hr>
+<div class="footer">
+  Cortex · Second Brain · Built by Miten Chauhan<br>
+  <span style="color:var(--purple)">∿</span> Part of the Apex AI Stack · <a href="https://miten.co.nz" style="color:var(--t2);text-decoration:none">miten.co.nz</a>
+</div>
+
+</div><!-- /app -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+const STORAGE_KEY = 'cortex_brain_v1';
+const API_URL = 'https://nexus-api.mitenchauhan08.workers.dev';
+
+let brain = [];
+let currentType = 'idea';
+let chatHistory = [];
+
+const typeConfig = {
+  idea:  { ico: '💡', color: 'rgba(196,110,240,.12)', textColor: 'var(--purple)', tagBg: 'rgba(196,110,240,.15)', tagColor: 'var(--purple)' },
+  link:  { ico: '🔗', color: 'rgba(110,175,240,.12)', textColor: 'var(--blue)',   tagBg: 'rgba(110,175,240,.15)', tagColor: 'var(--blue)' },
+  quote: { ico: '💬', color: 'rgba(110,240,212,.12)', textColor: 'var(--teal)',   tagBg: 'rgba(110,240,212,.15)', tagColor: 'var(--teal)' },
+  note:  { ico: '📝', color: 'rgba(201,240,110,.12)', textColor: 'var(--green)',  tagBg: 'rgba(201,240,110,.15)', tagColor: 'var(--green)' },
+};
+
+/* ── STORAGE ── */
+async function loadBrain() {
+  try {
+    const r = await window.storage.get(STORAGE_KEY);
+    brain = r ? JSON.parse(r.value) : [];
+  } catch { brain = []; }
+  refreshStats();
+  renderRecent();
+  renderAll();
+}
+
+async function saveBrain() {
+  try { await window.storage.set(STORAGE_KEY, JSON.stringify(brain)); } catch(e) { console.error(e); }
+}
+
+/* ── STATS ── */
+function refreshStats() {
+  document.getElementById('statNotes').textContent = brain.length;
+  const allTags = brain.flatMap(n => n.tags || []);
+  const uniqueTags = new Set(allTags);
+  document.getElementById('statTags').textContent = uniqueTags.size;
+  const connCount = brain.filter(n => n.connection).length;
+  document.getElementById('statConn').textContent = connCount;
+}
+
+/* ── THEME ── */
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('themeBtn').textContent = isDark ? '☀️' : '🌙';
+}
+
+/* ── TABS ── */
+function switchTab(t) {
+  ['save','brain','chat'].forEach(v => {
+    document.getElementById('view' + v.charAt(0).toUpperCase() + v.slice(1)).style.display = v === t ? '' : 'none';
+    document.getElementById('tab' + v.charAt(0).toUpperCase() + v.slice(1)).classList.toggle('act', v === t);
+  });
+  if (t === 'brain') renderAll();
+}
+
+/* ── TYPE SELECT ── */
+function selType(el) {
+  document.querySelectorAll('.type-chip').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+  currentType = el.dataset.type;
+}
+
+function onSaveInput() {
+  const v = document.getElementById('saveInput').value.trim();
+  document.getElementById('saveBtn').disabled = v.length < 3;
+  if (v.startsWith('http')) {
+    const linkChip = document.querySelector('[data-type="link"]');
+    if (linkChip && !linkChip.classList.contains('sel')) selType(linkChip);
+  }
+}
+
+/* ── SAVE ENTRY ── */
+async function saveEntry() {
+  const raw = document.getElementById('saveInput').value.trim();
+  if (!raw) return;
+
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = true;
+  btn.textContent = '…';
+
+  const bar = document.getElementById('procBar');
+  const fill = document.getElementById('procFill');
+  bar.style.display = 'block';
+  fill.style.width = '30%';
+
+  let processed;
+  try {
+    const contextSummaries = brain.slice(-5).map(n => `- ${n.summary} [${(n.tags||[]).join(', ')}]`).join('\n');
+
+    const systemPrompt = `You are Cortex, a second brain agent. When given a piece of content, you:
+1. Write a clear 1-2 sentence summary
+2. Assign 2-4 short topic tags (single words or short phrases, lowercase)
+3. If this connects to any existing memory, briefly note the connection (1 sentence max). If no clear connection, return null.
+
+Respond ONLY with valid JSON in this exact shape:
+{"summary":"...","tags":["...","..."],"connection":"..." or null}
+
+Existing memories for context:
+${contextSummaries || 'None yet.'}`;
+
+    fill.style.width = '55%';
+
+    const resp = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5',
+        max_tokens: 200,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: `Content type: ${currentType}\nContent: ${raw}` }]
+      })
+    });
+
+    fill.style.width = '80%';
+    const data = await resp.json();
+    const text = data.content?.[0]?.text || '';
+    const clean = text.replace(/```json|```/g, '').trim();
+    processed = JSON.parse(clean);
+  } catch(e) {
+    processed = { summary: raw.substring(0, 120), tags: [currentType], connection: null };
+  }
+
+  fill.style.width = '100%';
+
+  const entry = {
+    id: Date.now().toString(),
+    type: currentType,
+    raw,
+    summary: processed.summary,
+    tags: processed.tags || [],
+    connection: processed.connection || null,
+    savedAt: new Date().toISOString()
+  };
+
+  brain.unshift(entry);
+  await saveBrain();
+  refreshStats();
+  renderRecent();
+
+  setTimeout(() => {
+    bar.style.display = 'none';
+    fill.style.width = '0';
+  }, 500);
+
+  document.getElementById('saveInput').value = '';
+  btn.disabled = true;
+  btn.textContent = 'Save →';
+  showToast('💡 Memory saved & tagged');
+}
+
+/* ── RENDER ── */
+function noteCardHTML(entry) {
+  const cfg = typeConfig[entry.type] || typeConfig.idea;
+  const date = new Date(entry.savedAt);
+  const relTime = relativeTime(date);
+  const tagsHTML = (entry.tags || []).map(t =>
+    `<span class="ntag" style="background:${cfg.tagBg};color:${cfg.tagColor}">${t}</span>`
+  ).join('');
+  const connHTML = entry.connection
+    ? `<div class="note-connections">
+        <div style="flex-shrink:0">
+          <div class="conn-label">∿ Connected</div>
+        </div>
+        <div class="conn-text">${entry.connection}</div>
+      </div>` : '';
+
+  return `
+    <div class="note-card" id="nc-${entry.id}">
+      <div class="note-top">
+        <div class="note-type-ico" style="background:${cfg.color};color:${cfg.textColor}">${cfg.ico}</div>
+        <div class="note-body">
+          <div class="note-summary">${entry.summary}</div>
+          <div class="note-tags">${tagsHTML}</div>
+          <div class="note-meta">${relTime}</div>
+        </div>
+      </div>
+      ${connHTML}
+      <div class="note-actions">
+        <button class="nact-btn del" onclick="deleteEntry('${entry.id}')">Delete</button>
+        <button class="nact-btn" onclick="copyRaw('${entry.id}')">Copy original</button>
+      </div>
+    </div>`;
+}
+
+function renderRecent() {
+  const el = document.getElementById('recentList');
+  const recent = brain.slice(0, 5);
+  if (!recent.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-ico">🧠</div><div class="empty-title">Your brain is empty</div><div class="empty-sub">Save something above to get started.</div></div>`;
+    return;
+  }
+  el.innerHTML = recent.map(noteCardHTML).join('');
+}
+
+function renderAll(filter = '') {
+  const el = document.getElementById('allList');
+  let list = brain;
+  if (filter) {
+    const q = filter.toLowerCase();
+    list = brain.filter(n =>
+      n.summary?.toLowerCase().includes(q) ||
+      (n.tags || []).some(t => t.toLowerCase().includes(q)) ||
+      n.raw?.toLowerCase().includes(q)
+    );
+  }
+  if (!list.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-ico">🔍</div><div class="empty-title">${filter ? 'No matches found' : 'Nothing saved yet'}</div><div class="empty-sub">${filter ? 'Try a different keyword.' : 'Head to Save to add your first memory.'}</div></div>`;
+    return;
+  }
+  el.innerHTML = list.map(noteCardHTML).join('');
+}
+
+function filterNotes() {
+  renderAll(document.getElementById('searchInput').value.trim());
+}
+
+/* ── ACTIONS ── */
+async function deleteEntry(id) {
+  brain = brain.filter(n => n.id !== id);
+  await saveBrain();
+  refreshStats();
+  renderRecent();
+  renderAll(document.getElementById('searchInput').value.trim());
+  showToast('🗑 Memory deleted');
+}
+
+function copyRaw(id) {
+  const entry = brain.find(n => n.id === id);
+  if (!entry) return;
+  navigator.clipboard.writeText(entry.raw).then(() => showToast('📋 Copied'));
+}
+
+/* ── CHAT ── */
+function chipSend(msg) { document.getElementById('chatInput').value = msg; sendChat(); }
+function chatKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); } }
+function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 110) + 'px'; }
+
+function appendBubble(text, cls) {
+  const msgs = document.getElementById('chatMsgs');
+  const div = document.createElement('div');
+  div.className = `bubble ${cls}`;
+  div.textContent = text;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
+function showTyping() {
+  const msgs = document.getElementById('chatMsgs');
+  const d = document.createElement('div');
+  d.className = 'typing-dots';
+  d.id = 'typingDots';
+  d.innerHTML = '<span></span><span></span><span></span>';
+  msgs.appendChild(d);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function removeTyping() {
+  const d = document.getElementById('typingDots');
+  if (d) d.remove();
+}
+
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+  document.getElementById('sendBtn').disabled = true;
+
+  appendBubble(msg, 'user');
+  chatHistory.push({ role: 'user', content: msg });
+
+  showTyping();
+
+  const brainContext = brain.length
+    ? brain.map((n, i) =>
+        `[${i+1}] Type: ${n.type} | Tags: ${(n.tags||[]).join(', ')}\nSummary: ${n.summary}\nSaved: ${relativeTime(new Date(n.savedAt))}`
+      ).join('\n\n')
+    : 'No memories saved yet.';
+
+  const systemPrompt = `You are Cortex, Miten's personal second brain assistant. You have access to everything Miten has saved.
+
+Your job: answer questions by drawing from Miten's saved memories below. Reference specific memories when relevant. Be conversational, direct, and personal. If something isn't in the brain, say so honestly.
+
+MITEN'S BRAIN (${brain.length} memories):
+${brainContext}`;
+
+  try {
+    const resp = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5',
+        max_tokens: 400,
+        system: systemPrompt,
+        messages: chatHistory
+      })
+    });
+    const data = await resp.json();
+    const reply = data.content?.[0]?.text || 'Sorry, something went wrong.';
+    removeTyping();
+    appendBubble(reply, 'ai');
+    chatHistory.push({ role: 'assistant', content: reply });
+    if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20);
+  } catch(e) {
+    removeTyping();
+    appendBubble('Could not reach the API. Check your connection.', 'ai');
+  }
+
+  document.getElementById('sendBtn').disabled = false;
+}
+
+/* ── UTILS ── */
+function relativeTime(date) {
+  const diff = Date.now() - date.getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  if (days < 7) return `${days}d ago`;
+  return date.toLocaleDateString('en-NZ', { day: 'numeric', month: 'short' });
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* ── INIT ── */
+document.getElementById('datePill') && (document.getElementById('datePill').textContent = new Date().toLocaleDateString('en-NZ', { weekday: 'short', day: 'numeric', month: 'short' }));
+loadBrain();
+</script>
+</body>
+</html>

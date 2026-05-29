@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="ThreatLens AI — Threat intelligence agent by Miten Chauhan. Submit any IP, domain, CVE or threat actor for an advisor-grade intelligence brief.">
+<title>ThreatLens AI · Miten Chauhan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+
+[data-theme="dark"]{
+  --bg:#0c0c0f;--s1:#141418;--s2:#1a1a1f;--s3:#222228;
+  --b1:rgba(255,255,255,.06);--b2:rgba(255,255,255,.12);
+  --t1:#f0eeea;--t2:#9a9895;--t3:#55524f;
+  --green:#c9f06e;--blue:#6eaff0;--orange:#f0a56e;--purple:#c46ef0;--teal:#6ef0d4;--red:#f06e6e;
+  --nav-bg:rgba(12,12,15,.92);
+}
+[data-theme="light"]{
+  --bg:#f4f4f0;--s1:#fff;--s2:#f0f0eb;--s3:#e4e4de;
+  --b1:rgba(0,0,0,.07);--b2:rgba(0,0,0,.13);
+  --t1:#1a1a18;--t2:#5a5a55;--t3:#9a9a90;
+  --green:#4a8000;--blue:#1a5fb4;--orange:#b35c00;--purple:#6b3fa0;--teal:#0a6e6e;--red:#b03030;
+  --nav-bg:rgba(244,244,240,.92);
+}
+
+html,body{min-height:100%;background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;transition:background .25s,color .25s}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px}
+.app{max-width:680px;margin:0 auto;padding:0 0 60px}
+
+/* NAV */
+.nav{display:flex;justify-content:space-between;align-items:center;padding:11px 16px;border-bottom:1px solid var(--b1);background:var(--nav-bg);backdrop-filter:blur(14px);position:sticky;top:0;z-index:200;transition:background .25s}
+.nav-title{font-family:'DM Serif Display',serif;font-size:16px}.nav-title em{color:var(--teal);font-style:italic}
+.nav-right{display:flex;gap:8px;align-items:center}
+.nav-back{font-size:11px;color:var(--t3);text-decoration:none;padding:5px 10px;border-radius:6px;border:1px solid var(--b1);background:var(--s2);transition:all .15s}
+.nav-back:hover{color:var(--t1)}
+.theme-btn{width:30px;height:30px;border-radius:7px;border:1px solid var(--b1);background:var(--s2);color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .15s}
+.theme-btn:hover{border-color:var(--teal);color:var(--teal)}
+
+/* HERO */
+.hero{padding:22px 16px 18px;border-bottom:1px solid var(--b1);background:var(--bg)}
+.hero h1{font-family:'DM Serif Display',serif;font-size:28px;font-weight:400;letter-spacing:-.4px;line-height:1.1}.hero h1 em{color:var(--teal);font-style:italic}
+.hero p{font-size:12px;color:var(--t3);margin-top:5px;line-height:1.6;max-width:480px}
+.hero-meta{display:flex;gap:5px;flex-wrap:wrap;margin-top:12px}
+.hbadge{font-size:9px;padding:4px 9px;border-radius:99px;font-weight:500;border:.5px solid transparent}
+.hbadge.g{background:rgba(201,240,110,.1);color:var(--green);border-color:rgba(201,240,110,.2)}
+.hbadge.b{background:rgba(110,175,240,.1);color:var(--blue);border-color:rgba(110,175,240,.2)}
+.hbadge.p{background:rgba(196,110,240,.1);color:var(--purple);border-color:rgba(196,110,240,.2)}
+.hbadge.o{background:rgba(240,165,110,.1);color:var(--orange);border-color:rgba(240,165,110,.2)}
+.hbadge.t{background:rgba(110,240,212,.1);color:var(--teal);border-color:rgba(110,240,212,.2)}
+.live-chip{font-size:8px;padding:2px 7px;border-radius:99px;background:rgba(110,240,212,.1);color:var(--teal);border:.5px solid rgba(110,240,212,.25);font-weight:700;display:inline-flex;align-items:center;gap:3px}
+.ldot{width:5px;height:5px;border-radius:50%;background:#10b981;display:inline-block;animation:glow 2s infinite;flex-shrink:0}
+
+/* SECTION LABEL */
+.sec{font-size:9px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);padding:0 16px;margin:14px 0 9px}
+
+/* AGENT PANEL — uses same tile language */
+.panel{background:var(--s1);border:.5px solid var(--b1);border-radius:18px;margin:0 16px;overflow:hidden}
+
+.panel-chrome{display:flex;align-items:center;gap:7px;padding:11px 14px;background:var(--s2);border-bottom:.5px solid var(--b1)}
+.chrome-dot{width:9px;height:9px;border-radius:50%}
+.chrome-title{font-size:11px;color:var(--t3);font-family:'Courier Prime',monospace;flex:1;margin-left:4px}
+
+.input-section{padding:14px;border-bottom:.5px solid var(--b1)}
+.input-row{display:flex;gap:7px;margin-bottom:10px}
+.ioc-input{flex:1;height:40px;background:var(--bg);border:.5px solid var(--b2);border-radius:10px;color:var(--t1);font-family:'Courier Prime',monospace;font-size:12px;padding:0 13px;outline:none;transition:border-color .15s}
+.ioc-input:focus{border-color:var(--teal)}
+.ioc-input::placeholder{color:var(--t3)}
+.btn-scan{height:40px;padding:0 16px;background:var(--teal);color:#0c0c0f;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:opacity .15s}
+.btn-scan:hover{opacity:.85}
+.btn-scan:disabled{opacity:.4;cursor:not-allowed}
+
+.chips-label{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:7px}
+.chips{display:flex;gap:5px;flex-wrap:wrap}
+.chip{font-size:10px;padding:3px 10px;border-radius:99px;border:.5px solid var(--b2);background:var(--s2);color:var(--t2);cursor:pointer;font-family:'Courier Prime',monospace;transition:all .15s}
+.chip:hover{border-color:var(--teal);color:var(--teal)}
+
+/* OUTPUT */
+.output-section{padding:14px;min-height:320px}
+
+.idle-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:260px;gap:10px;color:var(--t3);font-size:12px;text-align:center}
+.idle-icon{font-size:36px;opacity:.25}
+
+.thinking-state{display:flex;flex-direction:column;gap:9px;padding:8px 0}
+.thinking-line{display:flex;align-items:center;gap:7px;color:var(--t3);font-size:11px;font-family:'Courier Prime',monospace;animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@keyframes glow{0%,100%{opacity:.4}50%{opacity:1}}
+
+/* REPORT */
+.report{animation:fadeUp .35s ease}
+.report-header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:14px}
+.risk-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:7px;font-size:10px;font-weight:700;letter-spacing:.05em}
+.risk-CRITICAL{background:rgba(240,110,110,.12);color:var(--red);border:.5px solid rgba(240,110,110,.25)}
+.risk-HIGH{background:rgba(240,165,110,.12);color:var(--orange);border:.5px solid rgba(240,165,110,.25)}
+.risk-MEDIUM{background:rgba(110,175,240,.12);color:var(--blue);border:.5px solid rgba(110,175,240,.25)}
+.risk-LOW{background:rgba(201,240,110,.12);color:var(--green);border:.5px solid rgba(201,240,110,.25)}
+
+.section-lbl{font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin:14px 0 5px}
+.prose{color:var(--t2);font-size:12px;line-height:1.75;white-space:pre-wrap;word-break:break-word}
+.divider{border:none;border-top:.5px solid var(--b1);margin:12px 0}
+
+.tag-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.tag{font-size:10px;padding:2px 9px;border-radius:5px;font-family:'Courier Prime',monospace}
+.tag-atk{background:rgba(240,110,110,.08);color:var(--red);border:.5px solid rgba(240,110,110,.18)}
+.tag-ioc{background:rgba(110,175,240,.08);color:var(--blue);border:.5px solid rgba(110,175,240,.18)}
+.tag-mit{background:rgba(110,240,212,.08);color:var(--teal);border:.5px solid rgba(110,240,212,.18)}
+
+.metrics-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:14px}
+.metric-card{background:var(--s2);border:.5px solid var(--b1);border-radius:11px;padding:10px 12px}
+.metric-val{font-family:'DM Serif Display',serif;font-size:20px;color:var(--t1)}
+.metric-lbl{font-size:9px;color:var(--t3);margin-top:2px;letter-spacing:.06em;text-transform:uppercase}
+
+.ts-line{font-size:10px;color:var(--t3);margin-top:14px;font-family:'Courier Prime',monospace}
+
+/* NEXUS BACK CARD */
+.back-card{margin:16px 16px 0;background:var(--s1);border:.5px solid var(--b1);border-radius:18px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;text-decoration:none;transition:border-color .2s}
+.back-card:hover{border-color:var(--b2)}
+.back-card-left{display:flex;align-items:center;gap:11px}
+.back-icon{width:34px;height:34px;background:rgba(201,240,110,.1);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.back-label{font-size:9px;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px}
+.back-title{font-family:'DM Serif Display',serif;font-size:15px;color:var(--t1)}
+.back-sub{font-size:11px;color:var(--t3);margin-top:1px}
+.back-arrow{font-size:18px;color:var(--t3)}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{display:inline-block;animation:spin .8s linear infinite}
+
+/* LIGHT OVERRIDES */
+[data-theme="light"] .panel{background:#fff;border-color:rgba(0,0,0,.08)}
+[data-theme="light"] .panel-chrome{background:#f0f0eb;border-color:rgba(0,0,0,.08)}
+[data-theme="light"] .ioc-input{background:#f4f4f0;border-color:rgba(0,0,0,.13)}
+[data-theme="light"] .chip{background:#f0f0eb;border-color:rgba(0,0,0,.1);color:#5a5a55}
+[data-theme="light"] .metric-card{background:#f0f0eb;border-color:rgba(0,0,0,.08)}
+[data-theme="light"] .back-card{background:#fff;border-color:rgba(0,0,0,.08)}
+[data-theme="light"] .btn-scan{color:#fff}
+</style>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+</head>
+<body>
+<div class="app">
+
+<nav class="nav">
+  <div class="nav-title">ThreatLens — <em>AI</em></div>
+  <div class="nav-right">
+    <a class="nav-back" href="apex.html">← Apex</a>
+    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
+  </div>
+</nav>
+
+<div class="hero">
+  <h1>ThreatLens <em>AI</em></h1>
+  <p>Submit any IP, domain, CVE, hash, or threat actor — the agent maps MITRE ATT&CK techniques and returns an advisor-grade intelligence brief. This is the analyst work, automated.</p>
+  <div class="hero-meta">
+    <span class="live-chip"><span class="ldot"></span>Live Agent</span>
+    <span class="hbadge t">MITRE ATT&CK</span>
+    <span class="hbadge b">IOC · CVE · Actors</span>
+    <span class="hbadge p">Risk Scoring</span>
+    <span class="hbadge g">Claude Sonnet 4.5</span>
+  </div>
+</div>
+
+<div class="sec">Agent</div>
+
+<div class="panel">
+  <div class="panel-chrome">
+    <div class="chrome-dot" style="background:#f06e6e"></div>
+    <div class="chrome-dot" style="background:#f0a56e"></div>
+    <div class="chrome-dot" style="background:#6ef0d4"></div>
+    <span class="chrome-title" id="chromeTitle">threatlens ~ awaiting input</span>
+    <span class="live-chip"><span class="ldot"></span>LIVE</span>
+  </div>
+
+  <div class="input-section">
+    <div class="input-row">
+      <input type="text" class="ioc-input" id="iocInput" placeholder="185.220.101.47  ·  CVE-2024-3400  ·  Lazarus Group  ·  cobalt-update.com" autocomplete="off" spellcheck="false" />
+      <button class="btn-scan" id="scanBtn" onclick="runScan()">Analyse →</button>
+    </div>
+    <div class="chips-label">Quick examples</div>
+    <div class="chips">
+      <span class="chip" onclick="prefill('185.220.101.47')">IP · 185.220.101.47</span>
+      <span class="chip" onclick="prefill('CVE-2024-3400')">CVE · CVE-2024-3400</span>
+      <span class="chip" onclick="prefill('Lazarus Group')">Actor · Lazarus Group</span>
+      <span class="chip" onclick="prefill('cobalt-update.com')">Domain · cobalt-update.com</span>
+      <span class="chip" onclick="prefill('LockBit ransomware')">Threat · LockBit</span>
+    </div>
+  </div>
+
+  <div class="output-section" id="outputSection">
+    <div class="idle-state">
+      <div class="idle-icon">🛡️</div>
+      <div>Agent standing by</div>
+      <div style="font-size:10px;opacity:.6">IP · Domain · CVE · Hash · Threat Actor</div>
+    </div>
+  </div>
+</div>
+
+<a href="apex.html" class="back-card">
+  <div class="back-card-left">
+    <div class="back-icon">◈</div>
+    <div>
+      <div class="back-label">Mission Control</div>
+      <div class="back-title">Apex · <em style="color:var(--gold,#f0c46e);font-style:italic">All Agents</em></div>
+      <div class="back-sub">Back to the full agent stack</div>
+    </div>
+  </div>
+  <div class="back-arrow">→</div>
+</a>
+
+</div>
+
+<script>
+// ── THEME
+const root=document.documentElement,themeBtn=document.getElementById('themeBtn');
+setTheme(localStorage.getItem('theme')||'dark');
+function setTheme(t){root.setAttribute('data-theme',t);themeBtn.textContent=t==='dark'?'🌙':'☀️';localStorage.setItem('theme',t);}
+function toggleTheme(){setTheme(root.getAttribute('data-theme')==='dark'?'light':'dark');}
+
+document.getElementById('iocInput').addEventListener('keydown',e=>{if(e.key==='Enter')runScan();});
+function prefill(v){document.getElementById('iocInput').value=v;runScan();}
+
+// ── AGENTIC SYSTEM PROMPT
+// Claude decides what to search and how many times.
+// We do not script the loop — Claude runs it.
+const AGENT_SYSTEM = `You are ThreatLens AI — a senior Threat Intelligence Analyst agent built by Miten Chauhan, Senior Cyber Security Advisor.
+
+You have access to a web_search tool. Use it to research the submitted indicator thoroughly before producing your brief.
+
+Your process — you decide:
+- What to search first based on the indicator type
+- Whether the first results reveal related actors, malware, or CVEs worth searching further
+- How many searches are needed before you have enough to produce an accurate brief
+- When you have sufficient intelligence to stop searching and draft
+
+Do not produce the brief until you have searched at least once. Follow leads — if a search reveals a threat actor name, CVE, or campaign you don't have full context on, search it.
+
+When ready, produce your structured intelligence brief using EXACTLY these headers:
+
+RISK_LEVEL: [CRITICAL|HIGH|MEDIUM|LOW]
+RISK_SCORE: [0-100]
+CATEGORY: [e.g. C2 Infrastructure, Ransomware, APT, Phishing, Zero-Day, etc.]
+SUMMARY:
+[2-3 sentences grounded in what your searches found. Cite specific findings.]
+
+THREAT_ACTOR:
+[Attribution based on your research, or "Unknown / No clear attribution"]
+
+MITRE_TECHNIQUES:
+- T#### - Technique Name
+[3-5 real ATT&CK techniques relevant to this indicator]
+
+INDICATORS_OF_COMPROMISE:
+- [Type]: [specific description]
+[4-5 IOCs to hunt for in an environment]
+
+MITIGATIONS:
+- [Specific technical mitigation]
+[4 actionable mitigations]
+
+METRICS:
+CVSS: [score or N/A]
+ACTIVE_CAMPAIGNS: [Yes/No/Unknown]
+IN_THE_WILD: [Yes/No/Unknown]
+
+Ground everything in your live research. Write like a real threat intelligence analyst. Do NOT use markdown formatting (no **, no ##, no ---) in your response — use plain text only with the exact headers specified.`;
+
+async function runScan(){
+  const input = document.getElementById('iocInput').value.trim();
+  if(!input) return;
+
+  const btn   = document.getElementById('scanBtn');
+  const out   = document.getElementById('outputSection');
+  const title = document.getElementById('chromeTitle');
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin">◌</span> Agent working…';
+  title.textContent = 'threatlens ~ ' + input;
+
+  out.innerHTML = `<div class="thinking-state" id="thinking"></div>`;
+  addThinkingLine('Agent initialising…');
+
+  // ── AGENTIC LOOP
+  // messages array grows as Claude uses tools and returns results.
+  // Claude decides what to search — we don't script it.
+  const messages = [
+    { role: 'user', content: 'Analyse this threat indicator: ' + input }
+  ];
+
+  let finalText = '';
+
+  try {
+    let loopCount = 0;
+    const MAX_LOOPS = 5;
+
+    while(loopCount < MAX_LOOPS) {
+      loopCount++;
+      let loopText = ''; // collect text from this iteration only
+
+      const response = await fetch('https://nexus-api.mitenchauhan08.workers.dev', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-5',
+          max_tokens: 1200,
+          system: AGENT_SYSTEM,
+          tools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: 5 }],
+          messages
+        })
+      });
+
+      const data = await response.json();
+
+      if(data.error) {
+        if(data.error.type === 'rate_limit_error') {
+          addThinkingLine('⚠ Rate limit — waiting 15s then retrying…');
+          await new Promise(r => setTimeout(r, 15000));
+          loopCount--; // don't count this iteration
+          continue;
+        }
+        throw new Error(data.error.message || 'API error');
+      }
+      if(!data.content) throw new Error('Empty response from API');
+
+      // Walk every block — show searches live, capture any text
+      for(const block of data.content) {
+        if(block.type === 'tool_use' && block.name === 'web_search') {
+          addThinkingLine(`⟳ Searching: "${block.input?.query || 'threat intelligence'}"`);
+        }
+        if(block.type === 'web_search_tool_result') {
+          addThinkingLine('✓ Results received — analysing…');
+        }
+        if(block.type === 'text' && block.text && block.text.trim()) {
+          loopText += block.text; // concatenate all text blocks in this response
+        }
+      }
+
+      // Use this iteration's text if it contains the structured brief
+      if(loopText.trim()) finalText = loopText;
+
+      // Claude finished — done
+      if(data.stop_reason === 'end_turn') break;
+
+      // Hit token limit but may have partial text — use it
+      if(data.stop_reason === 'max_tokens') break;
+
+      // Claude searched but hasn't written the brief yet
+      // Append its response + acknowledge tool results so it can continue
+      if(data.stop_reason === 'tool_use') {
+        messages.push({ role: 'assistant', content: data.content });
+
+        const toolResults = data.content
+          .filter(b => b.type === 'tool_use')
+          .map(b => {
+            // Find matching web_search_tool_result for this tool_use id
+            const result = data.content.find(r =>
+              r.type === 'web_search_tool_result' && r.tool_use_id === b.id
+            );
+            return {
+              type: 'tool_result',
+              tool_use_id: b.id,
+              content: result
+                ? (Array.isArray(result.content)
+                    ? result.content.map(c => c.text || '').join('\n')
+                    : JSON.stringify(result.content))
+                : 'Search completed.'
+            };
+          });
+
+        if(toolResults.length > 0) {
+          messages.push({ role: 'user', content: toolResults });
+        }
+        continue;
+      }
+
+      break;
+    }
+
+    addThinkingLine('✓ Intelligence brief compiled');
+
+    if(finalText) {
+      renderReport(input, finalText, out, title);
+    } else {
+      throw new Error('Agent produced no output — please try again');
+    }
+
+  } catch(err) {
+    out.innerHTML = `<div style="padding:1rem;color:var(--red);font-size:12px;font-family:'Courier Prime',monospace">
+      ⚠ Agent error: ${err.message}<br>
+      <span style="color:var(--t3);font-size:10px;margin-top:4px;display:block">Ensure Worker is deployed and API key is set</span>
+    </div>`;
+    title.textContent = 'threatlens ~ error';
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Analyse →';
+}
+
+function addThinkingLine(text){
+  const c = document.getElementById('thinking');
+  if(!c) return;
+  const d = document.createElement('div');
+  d.className = 'thinking-line';
+  d.textContent = text;
+  c.appendChild(d);
+}
+
+function stripMd(t){return(t||'').replace(/\*\*(.*?)\*\*/g,'$1').replace(/^#+\s*/gm,'').replace(/^---+$/gm,'').trim();}
+function get(text,key){const m=text.match(new RegExp('(?:##\\s*)?'+key+':?\\s*([^\\n]+)','i'));return m?stripMd(m[1]):null;}
+function getBlock(text,key){const m=text.match(new RegExp('(?:##\\s*)?'+key+':?\\s*\\n([\\s\\S]*?)(?=\\n(?:##\\s*)?[A-Z_]+:|$)','i'));return m?stripMd(m[1]):null;}
+function toTags(block,cls){
+  if(!block)return'<span style="font-size:11px;color:var(--t3)">—</span>';
+  return block.split('\n').map(l=>l.replace(/^[-•*]\s*/,'')).filter(Boolean)
+    .map(t=>`<span class="tag tag-${cls}">${t.trim()}</span>`).join('');
+}
+
+function renderReport(input,text,out,title){
+  const risk      = (get(text,'RISK_LEVEL')||'MEDIUM').toUpperCase().replace(/[^A-Z]/g,'');
+  const score     = get(text,'RISK_SCORE')||'—';
+  const cat       = get(text,'CATEGORY')||'Unknown';
+  const summary   = stripMd(getBlock(text,'SUMMARY')||get(text,'SUMMARY')||'Analysis complete.');
+  const actor     = stripMd(getBlock(text,'THREAT_ACTOR')||get(text,'THREAT_ACTOR')||'Unknown');
+  const mitre     = getBlock(text,'MITRE_TECHNIQUES')||'';
+  const iocs      = getBlock(text,'INDICATORS_OF_COMPROMISE')||'';
+  const mits      = getBlock(text,'MITIGATIONS')||'';
+  const cvss      = get(text,'CVSS')||'N/A';
+  const campaigns = get(text,'ACTIVE_CAMPAIGNS')||'Unknown';
+  const metColor  = v=>v==='Yes'?'var(--red)':v==='No'?'var(--teal)':'var(--t3)';
+
+  title.textContent = 'threatlens ~ ' + input;
+
+  out.innerHTML = `
+  <div class="report">
+    <div class="report-header">
+      <div><div class="risk-badge risk-${risk}">${risk} · ${cat}</div></div>
+      <div style="text-align:right">
+        <div style="font-size:9px;color:var(--t3);letter-spacing:.06em;text-transform:uppercase">Indicator</div>
+        <div style="font-size:11px;color:var(--t2);font-family:'Courier Prime',monospace;margin-top:2px">${input}</div>
+      </div>
+    </div>
+
+    <div class="section-lbl">Intelligence Summary</div>
+    <div class="prose">${summary}</div>
+
+    <div class="section-lbl">Threat Actor Attribution</div>
+    <div class="prose">${actor}</div>
+
+    <div class="divider"></div>
+
+    <div class="section-lbl">MITRE ATT&CK Techniques</div>
+    <div class="tag-row">${toTags(mitre,'atk')}</div>
+
+    <div class="section-lbl">Indicators of Compromise</div>
+    <div class="tag-row">${toTags(iocs,'ioc')}</div>
+
+    <div class="section-lbl">Recommended Mitigations</div>
+    <div class="tag-row">${toTags(mits,'mit')}</div>
+
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-val">${score}<span style="font-size:13px;color:var(--t3)">/100</span></div>
+        <div class="metric-lbl">Risk Score</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val" style="font-size:17px">${cvss}</div>
+        <div class="metric-lbl">CVSS Score</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val" style="font-size:14px;margin-top:3px;color:${metColor(campaigns)}">${campaigns}</div>
+        <div class="metric-lbl">Active Campaigns</div>
+      </div>
+    </div>
+
+    <div class="ts-line">ThreatLens AI · ${new Date().toUTCString()} · Agentic · Claude Sonnet 4.5</div>
+  </div>`;
+}
+</script>
+<div style="text-align:center;padding:24px 20px;font-size:11px;color:#4a4845;line-height:2">ThreatLens · Cyber Intelligence Agent · Built by Miten Chauhan<br><span style="color:#6ef0d4">∿</span> Part of the Apex AI Stack · <a href="https://miten.co.nz" style="color:#9a9895;text-decoration:none">miten.co.nz</a></div></body>
+</html>

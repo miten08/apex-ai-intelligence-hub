@@ -33,15 +33,11 @@ A multi-agent AI operating system built using Claude API, Cloudflare Workers, pe
 
 ## Screenshots
 
-(Add screenshots here)
-
 ## Live Demo
 
-https://your-site-url.com
+www.miten.co.nz
 
-## Architecture
 
-(Add architecture diagram later)
 
 ## Author
 

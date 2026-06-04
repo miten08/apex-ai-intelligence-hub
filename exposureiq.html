@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="ExposureIQ — vulnerability prioritisation and exposure management agent by Miten Chauhan. Live NVD CVEs, CISA KEV context and simulated asset exposure mapping.">
+<title>ExposureIQ · Vulnerability Prioritisation Agent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+
+[data-theme="dark"]{
+  --bg:#0a0b0f;--s1:#11141b;--s2:#171c25;--s3:#1f2633;--s4:#283244;
+  --b1:rgba(255,255,255,.06);--b2:rgba(255,255,255,.12);--b3:rgba(255,255,255,.18);
+  --t1:#f2f4f8;--t2:#a3adbd;--t3:#5d6878;
+  --cyan:#6ef0d4;--blue:#6eaff0;--green:#c9f06e;--orange:#f0a56e;--red:#f06e6e;--purple:#c46ef0;--gold:#f0c46e;
+  --nav-bg:rgba(10,11,15,.92);
+  --accent:var(--cyan);
+  --accent-dim:rgba(110,240,212,.10);
+  --accent-border:rgba(110,240,212,.24);
+}
+[data-theme="light"]{
+  --bg:#f4f7f6;--s1:#fff;--s2:#edf4f2;--s3:#e2eeeb;--s4:#d2e4df;
+  --b1:rgba(0,0,0,.07);--b2:rgba(0,0,0,.13);--b3:rgba(0,0,0,.18);
+  --t1:#121817;--t2:#4c5e5a;--t3:#8aa09b;
+  --cyan:#0a7c73;--blue:#1a5fb4;--green:#4a8000;--orange:#b35c00;--red:#b03030;--purple:#6b3fa0;--gold:#9a6400;
+  --nav-bg:rgba(244,247,246,.92);
+  --accent:var(--cyan);
+  --accent-dim:rgba(10,124,115,.08);
+  --accent-border:rgba(10,124,115,.22);
+}
+
+html,body{min-height:100%;background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;transition:background .25s,color .25s}
+body::before{content:'';position:fixed;inset:-30%;background:
+  radial-gradient(circle at 12% 0%,rgba(110,240,212,.13),transparent 28%),
+  radial-gradient(circle at 88% 10%,rgba(196,110,240,.10),transparent 30%),
+  radial-gradient(circle at 50% 100%,rgba(110,175,240,.08),transparent 26%);
+  pointer-events:none;z-index:0}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px}
+.app{max-width:1180px;margin:0 auto;padding:0 0 80px;position:relative;z-index:1}
+
+/* NAV */
+.nav{display:flex;justify-content:space-between;align-items:center;padding:11px 16px;border-bottom:1px solid var(--b1);background:var(--nav-bg);backdrop-filter:blur(14px);position:sticky;top:0;z-index:300;transition:background .25s}
+.nav-left{display:flex;align-items:center;gap:10px;min-width:0}
+.nav-title{font-family:'DM Serif Display',serif;font-size:16px;letter-spacing:-.2px;white-space:nowrap}
+.nav-title em{color:var(--accent);font-style:italic}
+.live-pill{display:inline-flex;align-items:center;gap:5px;font-family:'Courier Prime',monospace;font-size:9px;color:var(--accent);background:var(--accent-dim);border:.5px solid var(--accent-border);padding:3px 9px;border-radius:99px;white-space:nowrap}
+.ldot{width:5px;height:5px;border-radius:50%;background:var(--accent);animation:glow 2s infinite;flex-shrink:0}
+@keyframes glow{0%,100%{opacity:.35}50%{opacity:1}}
+.nav-right{display:flex;gap:6px;align-items:center}
+.nav-back{font-size:11px;color:var(--t3);text-decoration:none;padding:5px 10px;border-radius:6px;border:1px solid var(--b1);background:var(--s2);transition:all .15s}
+.nav-back:hover{color:var(--t1)}
+.theme-btn{width:30px;height:30px;border-radius:7px;border:1px solid var(--b1);background:var(--s2);color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .15s}
+.theme-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* HERO */
+.hero{padding:24px 16px 18px;border-bottom:1px solid var(--b1);background:linear-gradient(180deg,rgba(17,20,27,.78),rgba(10,11,15,.2))}
+.hero-grid{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start}
+.logo-row{display:flex;align-items:center;gap:14px}
+.logo{width:48px;height:48px;border-radius:15px;background:linear-gradient(135deg,var(--accent),var(--blue));display:flex;align-items:center;justify-content:center;color:#06110f;font-weight:900;font-size:20px;box-shadow:0 0 38px rgba(110,240,212,.16);flex-shrink:0}
+.hero h1{font-family:'DM Serif Display',serif;font-size:32px;font-weight:400;letter-spacing:-.5px;line-height:1.08}
+.hero h1 em{color:var(--accent);font-style:italic}
+.hero-sub{font-size:12px;color:var(--t3);margin-top:7px;line-height:1.7;max-width:680px}
+.hero-meta{display:flex;gap:5px;flex-wrap:wrap;margin-top:12px}
+.hbadge{font-size:9px;padding:4px 9px;border-radius:99px;font-weight:600;border:.5px solid transparent}
+.hbadge.t{background:rgba(110,240,212,.1);color:var(--cyan);border-color:rgba(110,240,212,.22)}
+.hbadge.b{background:rgba(110,175,240,.1);color:var(--blue);border-color:rgba(110,175,240,.22)}
+.hbadge.g{background:rgba(201,240,110,.1);color:var(--green);border-color:rgba(201,240,110,.22)}
+.hbadge.o{background:rgba(240,165,110,.1);color:var(--orange);border-color:rgba(240,165,110,.22)}
+.hbadge.p{background:rgba(196,110,240,.1);color:var(--purple);border-color:rgba(196,110,240,.22)}
+.hbadge.r{background:rgba(240,110,110,.1);color:var(--red);border-color:rgba(240,110,110,.22)}
+.hero-card{background:var(--s1);border:.5px solid var(--accent-border);border-radius:16px;padding:13px 14px;min-width:245px}
+.hero-card-k{font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:5px}
+.hero-card-v{font-size:13px;color:var(--t2);line-height:1.55}
+
+/* DEMO STRIP */
+.demo-strip{margin:12px 16px 0;background:rgba(240,165,110,.06);border:.5px solid rgba(240,165,110,.2);border-radius:12px;padding:9px 12px;font-size:11px;color:var(--orange);line-height:1.55}
+
+/* KPI GRID */
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;padding:14px 16px;border-bottom:1px solid var(--b1)}
+.kpi{background:var(--s1);border:.5px solid var(--b1);border-radius:14px;padding:13px;animation:fadeUp .35s ease both;transition:border-color .15s}
+.kpi:hover{border-color:var(--b2)}
+.kpi-label{font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:7px}
+.kpi-val{font-family:'DM Serif Display',serif;font-size:27px;line-height:1;color:var(--t1)}
+.kpi-val.accent{color:var(--accent)}
+.kpi-val.red{color:var(--red)}
+.kpi-val.orange{color:var(--orange)}
+.kpi-sub{font-size:10px;color:var(--t3);margin-top:5px;line-height:1.4}
+
+/* TABS + TOOLBAR */
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;border-bottom:1px solid var(--b1);position:sticky;top:48px;background:var(--nav-bg);backdrop-filter:blur(14px);z-index:200}
+.tabs{display:flex;gap:5px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;padding:7px 12px;border-radius:99px;border:.5px solid var(--b1);background:var(--s1);color:var(--t3);font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;white-space:nowrap}
+.tab.act{border-color:var(--accent-border);background:var(--accent-dim);color:var(--accent)}
+.actions{display:flex;align-items:center;gap:7px}
+.search-input{height:33px;width:230px;background:var(--s1);border:.5px solid var(--b2);border-radius:10px;color:var(--t1);font-family:'DM Sans',sans-serif;font-size:12px;padding:0 11px;outline:none}
+.search-input:focus{border-color:var(--accent-border)}
+.refresh-btn{height:33px;padding:0 13px;border-radius:10px;border:.5px solid var(--accent-border);background:var(--accent-dim);color:var(--accent);font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap}
+.refresh-btn.secondary{border-color:var(--b2);background:var(--s1);color:var(--t2)}
+.refresh-btn:disabled{opacity:.45;cursor:not-allowed}
+
+/* LAYOUT */
+.main-grid{display:grid;grid-template-columns:360px 1fr 330px;gap:12px;padding:14px 16px}
+.panel{background:var(--s1);border:.5px solid var(--b1);border-radius:18px;overflow:hidden;min-width:0;box-shadow:0 12px 45px rgba(0,0,0,.12)}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:.5px solid var(--b1);background:var(--s2)}
+.panel-title{font-size:12px;font-weight:800;color:var(--t1);letter-spacing:.02em}
+.panel-sub{font-family:'Courier Prime',monospace;font-size:9px;color:var(--t3)}
+.panel-body{padding:12px 14px}
+.feed-status{font-size:10px;color:var(--t3);line-height:1.5;padding:10px 14px;border-bottom:.5px solid var(--b1)}
+.list{max-height:690px;overflow-y:auto;padding:10px}
+
+/* THREAT CARDS */
+.tcard{background:var(--s2);border:.5px solid var(--b1);border-radius:14px;margin-bottom:8px;padding:11px;cursor:pointer;transition:all .15s;animation:fadeUp .35s ease both}
+.tcard:hover,.tcard.sel{border-color:var(--accent-border);background:var(--s3);transform:translateY(-1px)}
+.tcard-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px}
+.tcard-id{font-family:'Courier Prime',monospace;font-size:11px;color:var(--t1);font-weight:700}
+.tcard-name{font-size:11px;color:var(--t2);line-height:1.5;margin-bottom:8px}
+.tag-row{display:flex;gap:4px;flex-wrap:wrap}
+.tag{font-size:8px;padding:2px 7px;border-radius:99px;font-weight:700;border:.5px solid transparent;line-height:1.5}
+.tag.critical{background:rgba(240,110,110,.1);color:var(--red);border-color:rgba(240,110,110,.22)}
+.tag.high{background:rgba(240,165,110,.1);color:var(--orange);border-color:rgba(240,165,110,.22)}
+.tag.medium{background:rgba(110,175,240,.1);color:var(--blue);border-color:rgba(110,175,240,.22)}
+.tag.kev{background:rgba(196,110,240,.1);color:var(--purple);border-color:rgba(196,110,240,.22)}
+.tag.match{background:rgba(110,240,212,.1);color:var(--accent);border-color:var(--accent-border)}
+.tag.vendor{background:rgba(255,255,255,.04);color:var(--t3);border-color:var(--b1)}
+
+/* ANALYSIS */
+.analysis-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
+.analysis-id{font-family:'Courier Prime',monospace;font-size:13px;color:var(--accent);font-weight:700}
+.analysis-name{font-size:13px;color:var(--t2);line-height:1.6;margin-top:6px}
+.risk-area{display:flex;gap:17px;align-items:center;background:var(--s2);border:.5px solid var(--b1);border-radius:18px;padding:15px;margin-bottom:13px}
+.ring{width:108px;height:108px;border-radius:50%;background:conic-gradient(var(--red) var(--risk,0%), var(--s3) 0);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ring-inner{width:82px;height:82px;border-radius:50%;background:var(--s1);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.risk-num{font-family:'DM Serif Display',serif;font-size:30px;line-height:1;color:var(--t1)}
+.risk-lbl{font-family:'Courier Prime',monospace;font-size:8px;color:var(--t3);text-transform:uppercase}
+.risk-copy{font-size:12px;color:var(--t2);line-height:1.75}
+.detail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:13px}
+.detail{background:var(--s2);border:.5px solid var(--b1);border-radius:13px;padding:10px 11px}
+.detail-k{font-family:'Courier Prime',monospace;font-size:8px;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px}
+.detail-v{font-size:12px;color:var(--t1);font-weight:700;line-height:1.35}
+.sec{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);margin:14px 0 8px;display:flex;align-items:center;gap:8px}
+.sec::after{content:'';flex:1;height:.5px;background:var(--b1)}
+.prose{font-size:12px;color:var(--t2);line-height:1.8;white-space:pre-wrap}
+.ul{padding-left:17px;font-size:12px;color:var(--t2);line-height:1.8}
+.callout{background:var(--accent-dim);border:.5px solid var(--accent-border);border-radius:14px;padding:11px 12px;font-size:12px;color:var(--t2);line-height:1.75}
+.callout strong{color:var(--t1)}
+
+/* ASSETS */
+.asset-list{display:flex;flex-direction:column;gap:8px}
+.asset{background:var(--s2);border:.5px solid var(--b1);border-radius:14px;padding:11px;transition:all .15s}
+.asset.hit{border-color:var(--accent-border);background:linear-gradient(180deg,var(--accent-dim),rgba(255,255,255,.025));box-shadow:0 0 0 1px rgba(110,240,212,.06)}
+.asset-name{font-size:12px;font-weight:800;color:var(--t1);display:flex;align-items:center;gap:6px}
+.asset-meta{font-size:10px;color:var(--t3);line-height:1.6;margin-top:5px}
+.owner-pill{display:inline-flex;margin-top:7px;font-size:8px;color:var(--accent);border:.5px solid var(--accent-border);background:var(--accent-dim);padding:2px 7px;border-radius:99px}
+.exposure-box{margin-top:11px;background:var(--s2);border:.5px solid var(--b1);border-radius:15px;padding:11px;font-size:11px;color:var(--t2);line-height:1.7}
+.sources{padding:0 16px 18px;font-size:10px;color:var(--t3);line-height:1.7}
+.sources a{color:var(--accent);text-decoration:none}
+
+/* EMPTY / LOADING */
+.empty{padding:34px 18px;text-align:center;color:var(--t3);font-size:12px;line-height:1.7}
+.spinner{display:inline-block;width:10px;height:10px;border:1.5px solid var(--b2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* FOOTER */
+.back-card{margin:2px 16px 0;background:var(--s1);border:.5px solid var(--b1);border-radius:18px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;text-decoration:none;transition:border-color .2s}
+.back-card:hover{border-color:var(--b2)}
+.back-left{display:flex;align-items:center;gap:11px}
+.back-icon{width:34px;height:34px;background:var(--accent-dim);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.back-label{font-family:'Courier Prime',monospace;font-size:9px;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px}
+.back-title{font-family:'DM Serif Display',serif;font-size:15px;color:var(--t1)}
+.back-sub{font-size:11px;color:var(--t3);margin-top:1px}
+.back-arrow{font-size:18px;color:var(--t3)}
+.footer{text-align:center;padding:18px 20px 0;font-size:11px;color:var(--t3);line-height:2}
+hr{border:none;border-top:.5px solid var(--b1);margin:18px 16px}
+
+/* LIGHT */
+[data-theme="light"] body::before{opacity:.8}
+[data-theme="light"] .panel,[data-theme="light"] .kpi,[data-theme="light"] .hero-card,[data-theme="light"] .back-card{background:#fff}
+[data-theme="light"] .tcard,[data-theme="light"] .detail,[data-theme="light"] .asset,[data-theme="light"] .risk-area,[data-theme="light"] .exposure-box{background:#edf4f2}
+[data-theme="light"] .ring-inner{background:#fff}
+
+@media(max-width:1060px){
+  .main-grid{grid-template-columns:1fr}
+  .list{max-height:420px}
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+  .toolbar{flex-direction:column;align-items:stretch}
+  .actions{flex-wrap:wrap}
+  .search-input{width:100%;flex:1}
+  .hero-grid{grid-template-columns:1fr}
+  .hero-card{min-width:0}
+}
+@media(max-width:560px){
+  .kpi-grid{grid-template-columns:1fr}
+  .detail-grid{grid-template-columns:1fr}
+  .risk-area{flex-direction:column;align-items:flex-start}
+  .hero h1{font-size:27px}
+  .nav-title{font-size:15px}
+  .live-pill{display:none}
+}
+
+/* ── PREMIUM HERO FIX ── */
+.hero{
+  padding:22px 16px 18px;
+  border-bottom:1px solid var(--b1);
+  background:
+    radial-gradient(circle at top right, rgba(110,240,212,.10), transparent 32%),
+    linear-gradient(180deg, rgba(17,20,27,.86), rgba(10,11,15,.26));
+}
+.hero-grid{
+  display:block;
+}
+.logo-row{
+  display:flex;
+  align-items:flex-start;
+  gap:14px;
+}
+.logo{
+  width:42px;
+  height:42px;
+  border-radius:12px;
+  background:linear-gradient(135deg,var(--accent),var(--blue));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#06110f;
+  font-weight:900;
+  font-size:17px;
+  box-shadow:0 0 32px rgba(110,240,212,.18);
+  flex-shrink:0;
+  margin-top:4px;
+}
+.hero h1{
+  font-family:'DM Serif Display',serif;
+  font-size:30px;
+  font-weight:400;
+  letter-spacing:-.45px;
+  line-height:1.1;
+  max-width:620px;
+}
+.hero h1 em{color:var(--accent);font-style:italic}
+.hero-sub{
+  font-size:12px;
+  color:var(--t3);
+  margin-top:7px;
+  line-height:1.7;
+  max-width:620px;
+}
+.hero-meta{
+  display:flex;
+  gap:5px;
+  flex-wrap:wrap;
+  margin-top:13px;
+  padding-left:56px;
+}
+.hero-card{
+  margin-top:14px;
+  margin-left:56px;
+  background:linear-gradient(180deg,var(--s1),var(--s2));
+  border:.5px solid var(--accent-border);
+  border-radius:14px;
+  padding:11px 13px;
+  min-width:0;
+  max-width:760px;
+}
+.hero-card-k{
+  font-family:'Courier Prime',monospace;
+  font-size:8px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--accent);
+  margin-bottom:5px;
+}
+.hero-card-v{
+  font-size:12px;
+  color:var(--t2);
+  line-height:1.65;
+}
+.app{
+  max-width:1040px;
+}
+.main-grid{
+  grid-template-columns:320px 1fr;
+}
+.main-grid .panel:nth-child(3){
+  grid-column:1 / -1;
+}
+#assetList{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+}
+.asset-list{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+}
+.asset{
+  margin:0;
+}
+.feed-status{
+  font-size:10px;
+}
+.list{
+  max-height:620px;
+}
+.panel-body{
+  padding:12px 14px;
+}
+.sources{
+  padding:2px 16px 16px;
+}
+@media(max-width:900px){
+  .main-grid{grid-template-columns:1fr}
+  .main-grid .panel:nth-child(3){grid-column:auto}
+  .asset-list,#assetList{grid-template-columns:1fr}
+  .hero-meta,.hero-card{margin-left:0;padding-left:0}
+  .logo-row{align-items:flex-start}
+}
+@media(max-width:560px){
+  .hero h1{font-size:26px}
+  .logo{width:38px;height:38px;font-size:15px}
+  .hero-meta{padding-left:0}
+}
+
+</style>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚠️</text></svg>">
+</head>
+<body>
+<div class="app">
+
+<nav class="nav">
+  <div class="nav-left">
+    <div class="nav-title">Exposure<em>IQ</em></div>
+    <div class="live-pill"><span class="ldot"></span>LIVE CVE + EXPOSURE</div>
+  </div>
+  <div class="nav-right">
+    <a class="nav-back" href="apex.html">← Apex</a>
+    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-grid">
+    <div>
+      <div class="logo-row">
+        <div class="logo">EQ</div>
+        <div>
+          <h1>Exposure<em>IQ</em><br>Vulnerability Prioritisation Agent</h1>
+          <div class="hero-sub">  Combines live vulnerability intelligence from NVD and CISA KEV with organisational asset context to identify which exploited vulnerabilities actually matter most. ExposureIQ maps threat intelligence to asset exposure and business criticality, transforming CVE data into prioritised remediation actions.</div>
+        </div>
+      </div>
+      <div class="hero-meta">
+        <span class="hbadge t">NVD Recent CVEs</span>
+        <span class="hbadge p">CISA KEV Context</span>
+        <span class="hbadge b">Asset Exposure Mapping</span>
+        <span class="hbadge o">Patch Priority</span>
+        <span class="hbadge g">Executive Brief</span>
+      </div>
+    </div>
+    <div class="hero-card">
+      <div class="hero-card-k">Agent purpose</div>
+      <div class="hero-card-v">ThreatLens investigates indicators and threat actors. ExposureIQ prioritises remediation by mapping live CVEs to asset exposure, business criticality and patch urgency.</div>
+    </div>
+  </div>
+</section>
+
+<div class="demo-strip">
+	📡 Live vulnerability intelligence — public CVE data is fetched from NVD and CISA KEV. Asset inventory is simulated to demonstrate how a real CMDB / Tenable / Qualys / Defender / ServiceNow integration would prioritise remediation.
+</div>
+
+<section class="kpi-grid">
+  <div class="kpi"><div class="kpi-label">Latest CVEs</div><div class="kpi-val accent" id="kLatest">0</div><div class="kpi-sub">Recent high/critical NVD records</div></div>
+  <div class="kpi"><div class="kpi-label">Critical / High</div><div class="kpi-val red" id="kCritical">0</div><div class="kpi-sub">CVSS-driven priority</div></div>
+  <div class="kpi"><div class="kpi-label">CISA KEV Hits</div><div class="kpi-val" id="kKev">0</div><div class="kpi-sub">Known exploited overlap</div></div>
+  <div class="kpi"><div class="kpi-label">Asset Matches</div><div class="kpi-val orange" id="kMatches">0</div><div class="kpi-sub">Matched to simulated CMDB</div></div>
+  <div class="kpi"><div class="kpi-label">Top Priority</div><div class="kpi-val" id="kPriority">Review</div><div class="kpi-sub">Environment-driven risk</div></div>
+</section>
+
+<div class="toolbar">
+  <div class="tabs">
+    <button class="tab act" data-tab="latest">Latest CVEs</button>
+    <button class="tab" data-tab="kev">Known Exploited</button>
+    <button class="tab" data-tab="matched">Asset Matches</button>
+    <button class="tab" data-tab="vendor">My Vendors</button>
+  </div>
+  <div class="actions">
+    <input class="search-input" id="searchInput" placeholder="Search CVE, vendor, product..." />
+    <button class="refresh-btn" id="refreshBtn" onclick="loadThreats()">Refresh IntelStream</button>
+    <button class="refresh-btn secondary" onclick="selectDemoMatch()">Demo Match</button>
+  </div>
+</div>
+
+<div class="main-grid">
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <div class="panel-title">IntelStream Feed</div>
+        <div class="panel-sub" id="tabLabel">Latest CVEs</div>
+      </div>
+      <span class="live-pill" style="display:inline-flex"><span class="ldot"></span>LIVE</span>
+    </div>
+    <div class="feed-status" id="feedStatus"><span class="spinner"></span>Loading recent vulnerabilities...</div>
+    <div class="list" id="feedList"></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <div class="panel-title">Prioritisation View</div>
+        <div class="panel-sub" id="analysisState">Ready</div>
+      </div>
+      <span class="tag medium" id="statePill">WAITING</span>
+    </div>
+    <div class="panel-body">
+      <div class="analysis-head">
+        <div>
+          <div class="analysis-id" id="selectedId">Select a vulnerability</div>
+          <div class="analysis-name" id="selectedName">ExposureIQ will calculate risk using CVSS, CISA KEV status, internet exposure, asset criticality and business ownership.</div>
+        </div>
+        <span class="tag medium" id="severityPill">NONE</span>
+      </div>
+
+      <div class="risk-area">
+        <div class="ring" id="riskRing"><div class="ring-inner"><div class="risk-num" id="riskNum">--</div><div class="risk-lbl">Risk</div></div></div>
+        <div class="risk-copy" id="riskCopy">Select a CVE from the live feed or click Demo Match to see how ExposureIQ maps vulnerability intelligence to affected assets.</div>
+      </div>
+
+      <div class="detail-grid">
+        <div class="detail"><div class="detail-k">Vendor</div><div class="detail-v" id="dVendor">--</div></div>
+        <div class="detail"><div class="detail-k">Product</div><div class="detail-v" id="dProduct">--</div></div>
+        <div class="detail"><div class="detail-k">CVSS / Severity</div><div class="detail-v" id="dCvss">--</div></div>
+        <div class="detail"><div class="detail-k">Published</div><div class="detail-v" id="dPublished">--</div></div>
+      </div>
+
+      <div class="sec">Threat Summary</div>
+      <div class="prose" id="summary">No CVE selected.</div>
+
+      <div class="sec">Recommended Response</div>
+      <ul class="ul" id="responsePlan"><li>Select a vulnerability to generate remediation guidance.</li></ul>
+
+      <div class="sec">Executive Summary</div>
+      <div class="callout" id="execSummary">No executive summary generated yet.</div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <div class="panel-title">Asset Exposure</div>
+        <div class="panel-sub" id="assetCount">CMDB Simulation</div>
+      </div>
+      <span class="tag vendor">ExposureLens</span>
+    </div>
+    <div class="panel-body">
+      <div class="asset-list" id="assetList"></div>
+      <div class="sec">Exposure Result</div>
+      <div class="exposure-box" id="exposureResult">Select a CVE to compare it against the simulated organisation asset inventory.</div>
+    </div>
+  </section>
+</div>
+
+<div class="sources">
+  <strong>How this works:</strong> the static portfolio page fetches public NVD CVE data and CISA KEV context in the browser. In production this would sit behind a backend cache with authentication, API keys, audit logging, and integrations to CMDB / scanner platforms.
+</div>
+
+<a href="apex.html" class="back-card">
+  <div class="back-left">
+    <div class="back-icon">◈</div>
+    <div>
+      <div class="back-label">Mission Control</div>
+      <div class="back-title">Apex · <em style="color:var(--accent);font-style:italic">All Agents</em></div>
+      <div class="back-sub">Back to the full agent stack</div>
+    </div>
+  </div>
+  <div class="back-arrow">→</div>
+</a>
+
+<hr>
+<div class="footer">
+  ExposureIQ · Vulnerability Prioritisation Agent · Built by Miten Chauhan<br>
+  <span style="color:var(--accent)">⚠</span> Part of the Apex AI Stack · <a href="https://miten.co.nz" style="color:var(--t2);text-decoration:none">miten.co.nz</a>
+</div>
+
+</div>
+
+<script>
+/* ── THEME ── */
+const root=document.documentElement,themeBtn=document.getElementById('themeBtn');
+setTheme(localStorage.getItem('theme')||'dark');
+function setTheme(t){root.setAttribute('data-theme',t);themeBtn.textContent=t==='dark'?'🌙':'☀️';localStorage.setItem('theme',t)}
+function toggleTheme(){setTheme(root.getAttribute('data-theme')==='dark'?'light':'dark')}
+
+/* ── SOURCES ── */
+const KEV_URL='https://raw.githubusercontent.com/cisagov/kev-data/develop/known_exploited_vulnerabilities.json';
+const NVD_URL='https://services.nvd.nist.gov/rest/json/cves/2.0';
+
+let allThreats=[],kevSet=new Set(),kevMap=new Map(),activeTab='latest',selectedId=null;
+
+const orgAssets=[
+  {name:'NZ-EDGE-FW-01',vendor:'Fortinet',products:['FortiOS','FortiGate','FortiProxy','FortiManager','SSL VPN'],type:'Perimeter Firewall',exposure:'Internet-facing',criticality:'Critical',owner:'Network Security'},
+  {name:'NZ-SSLVPN-02',vendor:'Fortinet',products:['FortiOS','FortiGate','SSL VPN'],type:'Remote Access VPN',exposure:'Internet-facing',criticality:'Critical',owner:'Security Operations'},
+  {name:'PAN-EDGE-01',vendor:'Palo Alto Networks',products:['PAN-OS','GlobalProtect','Palo Alto'],type:'Next-Gen Firewall',exposure:'Internet-facing',criticality:'Critical',owner:'Network Security'},
+  {name:'CHECKPOINT-GW-01',vendor:'Check Point',products:['Security Gateway','Quantum','Check Point'],type:'Firewall Gateway',exposure:'Perimeter',criticality:'High',owner:'Network Security'},
+  {name:'CISCO-CORE-01',vendor:'Cisco',products:['IOS XE','IOS XR','ASA','Adaptive Security Appliance','Cisco'],type:'Core Network',exposure:'Internal / Management',criticality:'High',owner:'Network Operations'},
+  {name:'EXCH-MAIL-01',vendor:'Microsoft',products:['Exchange Server','Microsoft Exchange','Windows Server'],type:'Email Platform',exposure:'Hybrid / External Mail Flow',criticality:'High',owner:'Messaging'},
+  {name:'AZURE-IDP-01',vendor:'Microsoft',products:['Azure','Entra','Windows','Defender','SharePoint'],type:'Identity Platform',exposure:'Cloud',criticality:'Critical',owner:'Cyber Advisory'},
+  {name:'CITRIX-ADC-01',vendor:'Citrix',products:['NetScaler','ADC','Gateway','Citrix'],type:'Application Delivery',exposure:'Internet-facing',criticality:'Critical',owner:'Platform'},
+  {name:'LINUX-WEB-03',vendor:'Linux',products:['Linux Kernel','Kernel','Ubuntu','Debian','Red Hat'],type:'Web Server',exposure:'DMZ',criticality:'Medium',owner:'Platform'},
+  {name:'F5-APPGW-01',vendor:'F5',products:['BIG-IP','F5'],type:'Application Gateway',exposure:'Internet-facing',criticality:'High',owner:'Platform'},
+  {name:'ZSCALER-ZIA',vendor:'Zscaler',products:['Zscaler','ZIA','ZPA'],type:'SASE Platform',exposure:'Cloud',criticality:'High',owner:'Cyber Advisory'}
+];
+
+function escapeHtml(s){return String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+function fmtDate(s){if(!s)return'Unknown';try{return new Date(s).toLocaleDateString('en-NZ',{year:'numeric',month:'short',day:'numeric'})}catch(e){return s}}
+function isoDaysAgo(days){const d=new Date();d.setDate(d.getDate()-days);return d.toISOString().replace(/\.\d{3}Z/,'')}
+function getMetric(cve){const m=cve.metrics||{};const item=m.cvssMetricV40?.[0]||m.cvssMetricV31?.[0]||m.cvssMetricV30?.[0]||m.cvssMetricV2?.[0];return item?item.cvssData:null}
+function sevClass(sev,score){const s=(sev||'').toUpperCase();if(s==='CRITICAL'||score>=9)return'critical';if(s==='HIGH'||score>=7)return'high';return'medium'}
+function guessVendor(cve,desc){const text=(desc+' '+JSON.stringify(cve.configurations||{})).toLowerCase();const vendors=['Fortinet','Microsoft','Cisco','Palo Alto Networks','Check Point','Citrix','Zscaler','Linux','VMware','Apache','Oracle','Google','Apple','Ivanti','Atlassian','Juniper','F5','Adobe','SonicWall','Progress'];return vendors.find(v=>text.includes(v.toLowerCase()))||'Unknown'}
+function guessProduct(cve,desc){const text=desc.toLowerCase();const products=['FortiOS','FortiGate','Exchange Server','Windows','IOS XE','ASA','PAN-OS','GlobalProtect','NetScaler','Citrix ADC','Linux Kernel','BIG-IP','Zscaler','VMware vCenter','Apache HTTP Server','Ivanti Connect Secure','Confluence','SharePoint','SonicWall','MOVEit'];return products.find(p=>text.includes(p.toLowerCase()))||'Review NVD details'}
+
+function normaliseNvd(v){
+  const cve=v.cve;
+  const metric=getMetric(cve)||{};
+  const desc=cve.descriptions?.find(d=>d.lang==='en')?.value||'No English description available.';
+  const kev=kevMap.get(cve.id);
+  const vendor=guessVendor(cve,desc);
+  const product=guessProduct(cve,desc);
+  return {id:cve.id,name:desc.slice(0,120)+(desc.length>120?'...':''),description:desc,published:cve.published,lastModified:cve.lastModified,cvss:metric.baseScore||0,severity:metric.baseSeverity||'Unknown',vendor,product,isKev:kevSet.has(cve.id),kev,source:'NVD'}
+}
+
+function matchAssets(threat){
+  const blob=((threat.vendor||'')+' '+(threat.product||'')+' '+(threat.description||'')+' '+(threat.name||'')).toLowerCase();
+  return orgAssets.filter(a=>blob.includes(a.vendor.toLowerCase())||a.products.some(p=>blob.includes(p.toLowerCase())))
+}
+
+async function loadKev(){
+  const r=await fetch(KEV_URL);
+  const d=await r.json();
+  kevSet=new Set((d.vulnerabilities||[]).map(v=>v.cveID));
+  kevMap=new Map((d.vulnerabilities||[]).map(v=>[v.cveID,v]));
+}
+
+async function loadThreats(){
+  const btn=document.getElementById('refreshBtn');
+  btn.disabled=true;
+  document.getElementById('feedStatus').innerHTML='<span class="spinner"></span>Loading CISA KEV and recent NVD CVEs...';
+  try{
+    await loadKev();
+    const end=new Date().toISOString().replace(/\.\d{3}Z/,'');
+    const start=isoDaysAgo(30);
+    const url=`${NVD_URL}?pubStartDate=${encodeURIComponent(start)}&pubEndDate=${encodeURIComponent(end)}&cvssV3Severity=HIGH&resultsPerPage=80`;
+    const r=await fetch(url);
+    const d=await r.json();
+    allThreats=(d.vulnerabilities||[]).map(normaliseNvd).sort((a,b)=>(b.cvss-a.cvss)||new Date(b.published)-new Date(a.published));
+    if(!allThreats.length) loadDemoData();
+    document.getElementById('feedStatus').textContent=`Loaded ${allThreats.length} recent high/critical CVEs. CISA KEV context attached where overlap exists.`;
+  }catch(e){
+    console.error(e);
+    loadDemoData();
+    document.getElementById('feedStatus').textContent='Live feed unavailable or rate limited. Showing portfolio demo data with the same ExposureIQ logic.';
+  }
+  btn.disabled=false;
+  renderMetrics();renderAssets([]);renderFeed();
+}
+
+function loadDemoData(){
+  allThreats=[
+    {id:'CVE-DEMO-FORTINET',vendor:'Fortinet',product:'FortiOS',severity:'Critical',cvss:9.8,published:new Date().toISOString(),isKev:true,name:'FortiOS perimeter authentication bypass affecting internet-facing VPN devices',description:'Demo record showing how ExposureIQ maps a critical Fortinet vulnerability to internet-facing perimeter assets.'},
+    {id:'CVE-DEMO-CITRIX',vendor:'Citrix',product:'NetScaler',severity:'Critical',cvss:9.4,published:new Date().toISOString(),isKev:true,name:'NetScaler Gateway vulnerability affecting externally exposed application delivery controllers',description:'Demo record showing Citrix ADC exposure mapping.'},
+    {id:'CVE-DEMO-MICROSOFT',vendor:'Microsoft',product:'Exchange Server',severity:'High',cvss:8.8,published:new Date().toISOString(),isKev:false,name:'Exchange Server remote code execution requiring urgent patch validation',description:'Demo record showing email platform exposure mapping.'},
+    {id:'CVE-DEMO-CISCO',vendor:'Cisco',product:'IOS XE',severity:'Critical',cvss:9.6,published:new Date().toISOString(),isKev:true,name:'Cisco IOS XE management plane compromise risk',description:'Demo record showing network infrastructure matching.'}
+  ];
+}
+
+function filteredThreats(){
+  const q=document.getElementById('searchInput').value.trim().toLowerCase();
+  let arr=[...allThreats];
+  if(activeTab==='kev') arr=arr.filter(t=>t.isKev);
+  if(activeTab==='matched') arr=arr.filter(t=>matchAssets(t).length);
+  if(activeTab==='vendor') arr=arr.filter(t=>matchAssets(t).length || orgAssets.some(a=>(t.vendor||'').toLowerCase().includes(a.vendor.toLowerCase())));
+  if(q) arr=arr.filter(t=>JSON.stringify(t).toLowerCase().includes(q));
+  return arr;
+}
+
+function renderFeed(){
+  const list=document.getElementById('feedList');
+  const arr=filteredThreats();
+  document.getElementById('tabLabel').textContent=activeTab==='latest'?'Latest CVEs':activeTab==='kev'?'Known exploited':activeTab==='matched'?'Asset matches':'My vendors';
+  if(!arr.length){list.innerHTML='<div class="empty">No vulnerabilities match this view. Try another tab, search term, or click Demo Match.</div>';return}
+  list.innerHTML='';
+  arr.forEach(t=>{
+    const hits=matchAssets(t), sclass=sevClass(t.severity,t.cvss);
+    const el=document.createElement('div');
+    el.className='tcard'+(selectedId===t.id?' sel':'');
+    el.innerHTML=`
+      <div class="tcard-top">
+        <div class="tcard-id">${escapeHtml(t.id)}</div>
+        <span class="tag ${sclass}">${escapeHtml(t.severity||'UNKNOWN')}</span>
+      </div>
+      <div class="tcard-name">${escapeHtml(t.name)}</div>
+      <div class="tag-row">
+        <span class="tag vendor">${escapeHtml(t.vendor)}</span>
+        <span class="tag vendor">${escapeHtml(t.product)}</span>
+        ${t.isKev?'<span class="tag kev">CISA KEV</span>':''}
+        ${hits.length?`<span class="tag match">${hits.length} asset match</span>`:''}
+      </div>
+      <div style="font-family:'Courier Prime',monospace;font-size:9px;color:var(--t3);margin-top:8px">Published ${fmtDate(t.published)} ${t.cvss?`· CVSS ${t.cvss}`:''}</div>
+    `;
+    el.onclick=()=>selectThreat(t);
+    list.appendChild(el);
+  });
+}
+
+function renderAssets(matches){
+  const box=document.getElementById('assetList');
+  document.getElementById('assetCount').textContent=`${orgAssets.length} assets`;
+  box.innerHTML='';
+  orgAssets.forEach(a=>{
+    const hit=matches.some(m=>m.name===a.name);
+    const el=document.createElement('div');
+    el.className='asset'+(hit?' hit':'');
+    el.innerHTML=`
+      <div class="asset-name">${hit?'✅':''}<span>${escapeHtml(a.name)}</span></div>
+      <div class="asset-meta">${escapeHtml(a.type)} · ${escapeHtml(a.vendor)}<br>Exposure: ${escapeHtml(a.exposure)} · Criticality: ${escapeHtml(a.criticality)}</div>
+      <span class="owner-pill">${escapeHtml(a.owner)}</span>
+    `;
+    box.appendChild(el);
+  });
+}
+
+function renderMetrics(){
+  const critical=allThreats.filter(t=>t.cvss>=7||['HIGH','CRITICAL'].includes((t.severity||'').toUpperCase())).length;
+  const kev=allThreats.filter(t=>t.isKev).length;
+  const matches=allThreats.filter(t=>matchAssets(t).length).length;
+  document.getElementById('kLatest').textContent=allThreats.length;
+  document.getElementById('kCritical').textContent=critical;
+  document.getElementById('kKev').textContent=kev;
+  document.getElementById('kMatches').textContent=matches;
+  document.getElementById('kPriority').textContent=matches?'High':'Review';
+}
+
+function calculateRisk(t,hits){
+  let score=Number(t.cvss||7)*8;
+  if(t.isKev) score+=12;
+  if(hits.length) score+=14;
+  if(hits.some(h=>h.exposure.toLowerCase().includes('internet'))) score+=10;
+  if(hits.some(h=>h.criticality==='Critical')) score+=8;
+  return Math.min(100,Math.round(score));
+}
+
+function riskReason(t,hits,score){
+  const parts=[];
+  if(t.cvss) parts.push(`CVSS ${t.cvss}`);
+  if(t.isKev) parts.push('known exploited / CISA KEV');
+  if(hits.length) parts.push(`${hits.length} matching asset(s)`);
+  if(hits.some(h=>h.exposure.toLowerCase().includes('internet'))) parts.push('internet-facing exposure');
+  if(hits.some(h=>h.criticality==='Critical')) parts.push('critical business asset');
+  return `ExposureIQ ranked this ${score}/100 based on ${parts.join(', ') || 'available vulnerability metadata'}.`;
+}
+
+function responsePlan(t,hits){
+  const p=[
+    'Confirm affected product and version across inventory.',
+    'Review vendor advisory and validate patch or workaround availability.',
+    'Search SIEM / EDR / firewall logs for signs of exploitation.',
+    'Create remediation ticket with asset owner and due date.'
+  ];
+  if(t.isKev) p.unshift('Treat as urgent because this vulnerability appears in CISA KEV.');
+  if(hits.length) p.unshift(`Validate impacted assets: ${hits.map(h=>h.name).join(', ')}.`);
+  if(hits.some(h=>h.exposure.toLowerCase().includes('internet'))) p.unshift('Temporarily reduce or restrict internet exposure until remediation is complete.');
+  return p;
+}
+
+function execBrief(t,hits,score){
+  if(hits.length){
+    return `${t.id} affects technology that appears in the simulated organisation asset inventory. ExposureIQ ranked it ${score}/100 because live vulnerability intelligence overlaps with asset exposure and business criticality. Recommended action is owner notification, validation, mitigation and remediation tracking.`;
+  }
+  return `${t.id} is relevant from a vulnerability intelligence perspective, but no direct simulated asset match was found. The security team should still validate whether similar technology exists before closing the item.`;
+}
+
+function selectThreat(t){
+  selectedId=t.id;
+  document.getElementById('analysisState').textContent='Prioritised';
+  document.getElementById('statePill').textContent='ANALYSED';
+  document.getElementById('statePill').className='tag match';
+
+  const hits=matchAssets(t);
+  const score=calculateRisk(t,hits);
+  renderFeed();renderAssets(hits);
+
+  document.getElementById('selectedId').textContent=t.id;
+  document.getElementById('selectedName').textContent=t.name;
+  document.getElementById('severityPill').textContent=t.severity||'UNKNOWN';
+  document.getElementById('severityPill').className='tag '+sevClass(t.severity,t.cvss);
+  document.getElementById('riskNum').textContent=score;
+  document.getElementById('riskRing').style.setProperty('--risk',score+'%');
+  document.getElementById('riskCopy').textContent=riskReason(t,hits,score);
+  document.getElementById('dVendor').textContent=t.vendor;
+  document.getElementById('dProduct').textContent=t.product;
+  document.getElementById('dCvss').textContent=t.cvss?`${t.cvss} / ${t.severity}`:'Not available';
+  document.getElementById('dPublished').textContent=fmtDate(t.published);
+  document.getElementById('summary').textContent=t.description;
+  document.getElementById('responsePlan').innerHTML=responsePlan(t,hits).map(x=>`<li>${escapeHtml(x)}</li>`).join('');
+  document.getElementById('execSummary').innerHTML=`<strong>Executive brief:</strong><br>${escapeHtml(execBrief(t,hits,score))}`;
+  document.getElementById('exposureResult').innerHTML=hits.length
+    ? `<strong>${hits.length} impacted asset(s) found.</strong><br>${hits.map(h=>`${escapeHtml(h.name)} — ${escapeHtml(h.exposure)}, ${escapeHtml(h.criticality)} criticality`).join('<br>')}<br><br><strong>Decision:</strong> prioritise validation and remediation because threat intelligence overlaps with organisational asset context.`
+    : `<strong>No direct match found.</strong><br>The CVE does not match the simulated CMDB list. Manual validation is still recommended.`;
+}
+
+function selectDemoMatch(){
+  let demo=allThreats.find(t=>matchAssets(t).length);
+  if(!demo){
+    demo={id:'CVE-DEMO-FORTINET',vendor:'Fortinet',product:'FortiOS',severity:'Critical',cvss:9.8,published:new Date().toISOString(),isKev:true,name:'FortiOS perimeter authentication bypass affecting internet-facing VPN devices',description:'Demo record showing how ExposureIQ maps a critical Fortinet vulnerability to internet-facing perimeter assets.'};
+    allThreats.unshift(demo);
+    renderMetrics();renderFeed();
+  }
+  selectThreat(demo);
+}
+
+document.querySelectorAll('.tab').forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll('.tab').forEach(b=>b.classList.remove('act'));
+    btn.classList.add('act');
+    activeTab=btn.dataset.tab;
+    renderFeed();
+  };
+});
+document.getElementById('searchInput').addEventListener('input',renderFeed);
+
+renderAssets([]);
+loadThreats();
+</script>
+</body>
+</html>

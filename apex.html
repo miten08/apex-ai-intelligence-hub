@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="description" content="Apex — Miten's personal agent dashboard. Command bar, morning brief, and 6 AI agents built with Claude API, Gmail MCP, web search and persistent storage.">
+<meta name="description" content="Apex — Miten's personal agent dashboard. Command bar, morning brief, and 7 AI agents built with Claude API, Gmail MCP, web search, live CVE feeds and persistent storage.">
 <title>Apex — Mission Control · Miten Chauhan</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -494,6 +494,11 @@ a{text-decoration:none;color:inherit;}
       ThreatLens
       <span class="sb-link-right"><span class="sb-status s-live">LIVE</span></span>
     </a>
+    <a class="sb-link" href="exposureiq.html">
+      <div class="sb-ico" style="background:rgba(45,212,191,.12)">⚠️</div>
+      ExposureIQ
+      <span class="sb-link-right"><span class="sb-status s-live">LIVE</span></span>
+    </a>
     <a class="sb-link" href="techbrief.html">
       <div class="sb-ico" style="background:rgba(96,165,250,.1)">📰</div>
       TechBrief
@@ -534,7 +539,7 @@ a{text-decoration:none;color:inherit;}
   <div class="page-hero">
     <div class="page-hero-left">
       <h1 class="page-hero-title">APEX — <em>MISSION CONTROL</em></h1>
-      <p class="page-hero-sub">Centralized dashboard managing a suite of specialized AI agents and tools. On load, the system populates your dynamic Morning Brief by pulling live data from Forge, running autonomous web lookups via TechBrief, and processing triage feeds from InboxIQ. InboxIQ and CapitalLens use demo data — connecting personal accounts to a public site would be a privacy risk.</p>
+      <p class="page-hero-sub">Apex is the mission control layer for a suite of specialized AI agents and intelligence systems. On load, the platform generates a dynamic Morning Brief by combining workout recommendations from Forge, curated technology and cybersecurity news from TechBrief, and email triage insights from InboxIQ. ExposureIQ provides on-demand vulnerability prioritisation using public NVD and CISA KEV intelligence alongside a simulated enterprise asset inventory. InboxIQ and CapitalLens use demo data, while ExposureIQ combines live vulnerability intelligence with simulated asset context. Personal and organisational data is intentionally excluded from the public site to avoid privacy and security risks</p>
       <div class="hero-badges">
         <span class="hbadge g">Claude API</span>
         <span class="hbadge gr">Forge · Cortex live</span>
@@ -543,8 +548,8 @@ a{text-decoration:none;color:inherit;}
       </div>
     </div>
     <div class="page-hero-stats">
-      <div class="hero-stat"><span class="hero-stat-n">6</span><span class="hero-stat-l">Agents</span></div>
-      <div class="hero-stat"><span class="hero-stat-n">4<em>+</em></span><span class="hero-stat-l">Live</span></div>
+      <div class="hero-stat"><span class="hero-stat-n">7</span><span class="hero-stat-l">Agents</span></div>
+      <div class="hero-stat"><span class="hero-stat-n">5<em>+</em></span><span class="hero-stat-l">Live</span></div>
       <div class="hero-stat"><span class="hero-stat-n">2</span><span class="hero-stat-l">Demo</span></div>
     </div>
   </div>
@@ -567,6 +572,7 @@ a{text-decoration:none;color:inherit;}
         <span class="cmd-chip" onclick="quickCmd('What is my workout today and how is my recent progress?')">Workout & progress</span>
         <span class="cmd-chip" onclick="quickCmd('What have I saved to Cortex recently?')">Cortex recap</span>
         <span class="cmd-chip" onclick="quickCmd('What is happening in tech today?')">Tech news today</span>
+        <span class="cmd-chip" onclick="quickCmd('Which vulnerabilities should be prioritised?')">Exposure risk</span>
       </div>
       <div id="cmdResult" style="display:none"></div>
     </div>
@@ -610,7 +616,7 @@ a{text-decoration:none;color:inherit;}
 
   <div class="footer">
     Apex · Mission Control · Built by Miten Chauhan<br>
-    <span style="color:var(--gold2)">◈</span> 6 AI agents · Claude API · Wellington, NZ ·
+    <span style="color:var(--gold2)">◈</span> 7 AI agents · Claude API · Wellington, NZ ·
     <a href="index.html">miten.co.nz</a>
   </div>
 </div>
@@ -671,7 +677,8 @@ function routeQuery(query) {
     techbrief: /tech|news|ai|cyber|security|dev|latest|today|happening|update|story/i.test(query),
     inboxiq: /email|inbox|mail|urgent|message|ird|anz|seek|bill|rent|spark/i.test(query),
     capitallens: /money|finance|financial|deposit|kiwisaver|budget|salary|surplus|spend|mortgage|rate/i.test(query),
-    threatlens: /threat|cve|ip|domain|malware|hack|breach|vulnerability|ioc|attack|actor/i.test(query),
+    threatlens: /threat|ip|domain|malware|hack|breach|ioc|attack|actor/i.test(query),
+    exposureiq: /exposure|prioriti[sz]e|prioritisation|prioritization|remediation|patch|vulnerability|cve|cvss|kev|asset|cmdb|risk/i.test(query),
   };
   const anyMatch = Object.values(routes).some(Boolean);
   if (!anyMatch) return { forge: true, cortex: true, techbrief: true, inboxiq: true, capitallens: true, threatlens: false };
@@ -696,7 +703,8 @@ async function runCommand() {
   if (routes.techbrief) steps.push({ id:'techbrief', label:'📰 TechBrief', fn: async () => '(will search live)' });
   if (routes.inboxiq) steps.push({ id:'inboxiq', label:'📬 InboxIQ (demo)', fn: async () => INBOXIQ_DEMO.data });
   if (routes.capitallens) steps.push({ id:'cap', label:'📊 CapitalLens (demo)', fn: async () => CAPITALLENS_DEMO.data });
-  if (routes.threatlens) steps.push({ id:'threatlens', label:'🛡 ThreatLens', fn: async () => 'ThreatLens is on-demand — open the ThreatLens page to submit an IP, domain or CVE for analysis.' });
+  if (routes.threatlens) steps.push({ id:'threatlens', label:'🛡 ThreatLens', fn: async () => 'ThreatLens is on-demand — open the ThreatLens page to submit an IP, domain, CVE or threat actor for investigation.' });
+  if (routes.exposureiq) steps.push({ id:'exposureiq', label:'⚠️ ExposureIQ', fn: async () => 'ExposureIQ is on-demand — open the ExposureIQ page to prioritise live CVEs against simulated asset exposure and remediation urgency.' });
 
   function renderSteps(activeId) {
     return steps.map(s => { const cls = s._done ? 'done' : s.id === activeId ? 'active' : ''; const ico = s._done ? '✓ ' : s.id === activeId ? '<span class="spinner"></span> ' : ''; return `<span class="cmd-step ${cls}">${ico}${s.label}</span>`; }).join('');
@@ -719,6 +727,7 @@ async function runCommand() {
   if (gathered.inboxiq) contextParts.push(`INBOXIQ (demo): ${gathered.inboxiq}`);
   if (gathered.cap) contextParts.push(`CAPITALLENS (demo): ${gathered.cap}`);
   if (gathered.threatlens) contextParts.push(`THREATLENS: ${gathered.threatlens}`);
+  if (gathered.exposureiq) contextParts.push(`EXPOSUREIQ: ${gathered.exposureiq}`);
 
   const sys = `You are Apex, Miten's personal AI chief of staff. Answer using ONLY the agent data below — never invent or speculate. Be sharp and direct. Under 150 words.\n\nAGENT DATA:\n${contextParts.join('\n\n')}`;
   const apiBody = { model: 'claude-sonnet-4-5', max_tokens: 400, system: sys, messages: [{ role: 'user', content: query }] };
@@ -782,6 +791,7 @@ async function generateBrief(preloadedForge, preloadedCortex) {
 const AGENT_DEFS = [
   { id:'inboxiq', name:'InboxIQ', lbl:'Gmail Agent', icon:'📬', href:'inboxiq.html', icoStyle:'background:rgba(96,165,250,.12)', status:'s-agent', statusLabel:'MCP AGENT', sub:'Gmail MCP agent — demo inbox for portfolio', accent:'#60a5fa', live: false },
   { id:'threatlens', name:'ThreatLens', lbl:'Cyber Intel', icon:'🛡', href:'threatlens.html', icoStyle:'background:rgba(45,212,191,.12)', status:'s-live', statusLabel:'LIVE', sub:'IP · Domain · CVE · Threat Actor', accent:'#2dd4bf', live: true },
+  { id:'exposureiq', name:'ExposureIQ', lbl:'Exposure Mgmt', icon:'⚠️', href:'exposureiq.html', icoStyle:'background:rgba(45,212,191,.12)', status:'s-live', statusLabel:'LIVE FEEDS', sub:'NVD · CISA KEV · Asset risk', accent:'#2dd4bf', live: true },
   { id:'techbrief', name:'TechBrief', lbl:'Daily Intel', icon:'📰', href:'techbrief.html', icoStyle:'background:rgba(96,165,250,.1)', status:'s-search', statusLabel:'WEB SEARCH', sub:'AI · Cyber · Dev · NZ Tech', accent:'#60a5fa', live: true },
   { id:'cortex', name:'Cortex', lbl:'Second Brain', icon:'🧠', href:'cortex.html', icoStyle:'background:rgba(192,132,252,.12)', status:'s-memory', statusLabel:'LIVE STORAGE', sub:'Save ideas · Auto-tag · Chat', accent:'#c084fc', live: true },
   { id:'forge', name:'Forge', lbl:'Workout Coach', icon:'💪', href:'forge.html', icoStyle:'background:rgba(251,146,60,.12)', status:'s-search', statusLabel:'LIVE STORAGE', sub:'PPL programme · Session log', accent:'#fb923c', live: true },
@@ -796,6 +806,7 @@ function renderTiles(forgeData, cortexData) {
     else if (a.id === 'cortex') { sigs = cortexData.count > 0 ? [`${cortexData.count} memories saved`, cortexData.tags.slice(0,3).join(' · ') || 'No tags yet'] : ['No memories saved yet', 'Drop your first note in Cortex']; }
     else if (a.id === 'inboxiq') { sigs = ['3 priority emails (demo)', 'IRD · ANZ · Seek alerts']; }
     else if (a.id === 'threatlens') { sigs = ['Submit any IOC for analysis', 'Advisor-grade intel briefs']; }
+    else if (a.id === 'exposureiq') { sigs = ['Prioritise live CVEs by exposure', 'NVD + CISA KEV + simulated CMDB']; }
     else if (a.id === 'techbrief') { sigs = ['Auto-runs on open', '4 live research chains daily']; }
     else if (a.id === 'capitallens') { sigs = ['Live NZ mortgage & OCR data', 'Demo profile · health score 72/100']; }
     const sigsHTML = sigs.map(s => `<div class="sig-row"><div class="sig-dot" style="background:${a.accent}"></div><div class="sig-text">${s}</div></div>`).join('');
@@ -841,7 +852,7 @@ async function init() {
 
   const [forgeData, cortexData] = await Promise.all([readForge(), readCortex()]);
   renderTiles(forgeData, cortexData);
-  document.getElementById('pillText').textContent = '6 AGENTS';
+  document.getElementById('pillText').textContent = '7 AGENTS';
 
   const briefDelay = /Mobi|Android|iPhone/i.test(navigator.userAgent) ? 3000 : 1500;
   setTimeout(() => generateBrief(forgeData, cortexData), briefDelay);
@@ -851,4 +862,3 @@ init();
 </script>
 </body>
 </html>
-

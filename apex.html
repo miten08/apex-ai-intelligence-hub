@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="description" content="Apex — Miten's personal agent dashboard. Command bar, morning brief, and 7 AI agents built with Claude API, Gmail MCP, web search, live CVE feeds and persistent storage.">
+<meta name="description" content="Apex — Miten's AI intelligence dashboard and orchestration layer. Command bar, morning brief, specialised AI systems, agentic research workflows, Claude API, Gmail MCP, web search, live CVE feeds and persistent storage.">
 <title>Apex — Mission Control · Miten Chauhan</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -483,7 +483,7 @@ a{text-decoration:none;color:inherit;}
   <div class="sb-divider"></div>
 
   <div class="sb-section">
-    <span class="sb-label">Agents</span>
+    <span class="sb-label">Systems</span>
     <a class="sb-link" href="inboxiq.html">
       <div class="sb-ico" style="background:rgba(96,165,250,.12)">📬</div>
       InboxIQ
@@ -539,7 +539,7 @@ a{text-decoration:none;color:inherit;}
   <div class="page-hero">
     <div class="page-hero-left">
       <h1 class="page-hero-title">APEX — <em>MISSION CONTROL</em></h1>
-      <p class="page-hero-sub">Apex is the mission control layer for a suite of specialized AI agents and intelligence systems. On load, the platform generates a dynamic Morning Brief by combining workout recommendations from Forge, curated technology and cybersecurity news from TechBrief, and email triage insights from InboxIQ. ExposureIQ provides on-demand vulnerability prioritisation using public NVD and CISA KEV intelligence alongside a simulated enterprise asset inventory. InboxIQ and CapitalLens use demo data, while ExposureIQ combines live vulnerability intelligence with simulated asset context. Personal and organisational data is intentionally excluded from the public site to avoid privacy and security risks</p>
+      <p class="page-hero-sub">Apex is the mission control layer for a suite of specialised AI systems, agentic research workflows, and decision-support tools. On load, the platform generates a dynamic Morning Brief by combining workout recommendations from Forge, curated technology and cybersecurity news from TechBrief, and email triage insights from InboxIQ. ExposureIQ provides on-demand vulnerability prioritisation using public NVD and CISA KEV intelligence alongside a simulated enterprise asset inventory. InboxIQ and CapitalLens use demo data, while ExposureIQ combines live vulnerability intelligence with simulated asset context. Personal and organisational data is intentionally excluded from the public site to avoid privacy and security risks</p>
       <div class="hero-badges">
         <span class="hbadge g">Claude API</span>
         <span class="hbadge gr">Forge · Cortex live</span>
@@ -548,7 +548,7 @@ a{text-decoration:none;color:inherit;}
       </div>
     </div>
     <div class="page-hero-stats">
-      <div class="hero-stat"><span class="hero-stat-n">7</span><span class="hero-stat-l">Agents</span></div>
+      <div class="hero-stat"><span class="hero-stat-n">7</span><span class="hero-stat-l">Systems</span></div>
       <div class="hero-stat"><span class="hero-stat-n">5<em>+</em></span><span class="hero-stat-l">Live</span></div>
       <div class="hero-stat"><span class="hero-stat-n">2</span><span class="hero-stat-l">Demo</span></div>
     </div>
@@ -559,7 +559,7 @@ a{text-decoration:none;color:inherit;}
     <div class="cmd-card-hdr">
       <div class="cmd-card-hdr-ico">⌘</div>
       <div class="cmd-card-hdr-title">Command</div>
-      <div class="cmd-card-hdr-sub">Routes to relevant agents automatically</div>
+      <div class="cmd-card-hdr-sub">Routes requests across specialised AI systems</div>
     </div>
     <div class="cmd-body">
       <div class="cmd-row">
@@ -568,7 +568,7 @@ a{text-decoration:none;color:inherit;}
       </div>
       <div class="cmd-chips">
         <span class="cmd-chip" onclick="quickCmd('What needs my attention today?')">Attention today</span>
-        <span class="cmd-chip" onclick="quickCmd('Summarise my week across all agents')">Week summary</span>
+        <span class="cmd-chip" onclick="quickCmd('Summarise my week across all systems')">Week summary</span>
         <span class="cmd-chip" onclick="quickCmd('What is my workout today and how is my recent progress?')">Workout & progress</span>
         <span class="cmd-chip" onclick="quickCmd('What have I saved to Cortex recently?')">Cortex recap</span>
         <span class="cmd-chip" onclick="quickCmd('What is happening in tech today?')">Tech news today</span>
@@ -597,7 +597,7 @@ a{text-decoration:none;color:inherit;}
   </div>
 
   <!-- Agent Grid -->
-  <div class="section-label">Your agents</div>
+  <div class="section-label">Your AI Systems</div>
   <div class="agent-grid" id="agentGrid"></div>
 
   <!-- Stack -->
@@ -616,7 +616,7 @@ a{text-decoration:none;color:inherit;}
 
   <div class="footer">
     Apex · Mission Control · Built by Miten Chauhan<br>
-    <span style="color:var(--gold2)">◈</span> 7 AI agents · Claude API · Wellington, NZ ·
+    <span style="color:var(--gold2)">◈</span> 7 AI systems · Claude API · Wellington, NZ ·
     <a href="index.html">miten.co.nz</a>
   </div>
 </div>
@@ -710,11 +710,11 @@ async function runCommand() {
     return steps.map(s => { const cls = s._done ? 'done' : s.id === activeId ? 'active' : ''; const ico = s._done ? '✓ ' : s.id === activeId ? '<span class="spinner"></span> ' : ''; return `<span class="cmd-step ${cls}">${ico}${s.label}</span>`; }).join('');
   }
 
-  resultWrap.innerHTML = `<div class="cmd-result"><div class="cmd-result-hdr" id="cmdSteps"><span style="color:var(--gold2)">◈</span> querying agents… ${renderSteps(steps[0]?.id)}</div><div class="cmd-result-body"><div class="typing-dots"><span></span><span></span><span></span></div></div></div>`;
+  resultWrap.innerHTML = `<div class="cmd-result"><div class="cmd-result-hdr" id="cmdSteps"><span style="color:var(--gold2)">◈</span> querying systems… ${renderSteps(steps[0]?.id)}</div><div class="cmd-result-body"><div class="typing-dots"><span></span><span></span><span></span></div></div></div>`;
 
   const gathered = {};
   for (const step of steps) {
-    document.getElementById('cmdSteps').innerHTML = `<span style="color:var(--gold2)">◈</span> querying agents… ${renderSteps(step.id)}`;
+    document.getElementById('cmdSteps').innerHTML = `<span style="color:var(--gold2)">◈</span> querying systems… ${renderSteps(step.id)}`;
     try { gathered[step.id] = await step.fn(); } catch { gathered[step.id] = 'unavailable'; }
     step._done = true;
   }
@@ -729,7 +729,7 @@ async function runCommand() {
   if (gathered.threatlens) contextParts.push(`THREATLENS: ${gathered.threatlens}`);
   if (gathered.exposureiq) contextParts.push(`EXPOSUREIQ: ${gathered.exposureiq}`);
 
-  const sys = `You are Apex, Miten's personal AI chief of staff. Answer using ONLY the agent data below — never invent or speculate. Be sharp and direct. Under 150 words.\n\nAGENT DATA:\n${contextParts.join('\n\n')}`;
+  const sys = `You are Apex, Miten's AI mission control layer. Answer using ONLY the system data below — never invent or speculate. Be sharp and direct. Under 150 words.\n\nSYSTEM DATA:\n${contextParts.join('\n\n')}`;
   const apiBody = { model: 'claude-sonnet-4-5', max_tokens: 400, system: sys, messages: [{ role: 'user', content: query }] };
   if (routes.techbrief) apiBody.tools = [{ type: 'web_search_20250305', name: 'web_search' }];
 
@@ -789,13 +789,13 @@ async function generateBrief(preloadedForge, preloadedCortex) {
 }
 
 const AGENT_DEFS = [
-  { id:'inboxiq', name:'InboxIQ', lbl:'Gmail Agent', icon:'📬', href:'inboxiq.html', icoStyle:'background:rgba(96,165,250,.12)', status:'s-agent', statusLabel:'MCP AGENT', sub:'Gmail MCP agent — demo inbox for portfolio', accent:'#60a5fa', live: false },
-  { id:'threatlens', name:'ThreatLens', lbl:'Cyber Intel', icon:'🛡', href:'threatlens.html', icoStyle:'background:rgba(45,212,191,.12)', status:'s-live', statusLabel:'LIVE', sub:'IP · Domain · CVE · Threat Actor', accent:'#2dd4bf', live: true },
+  { id:'inboxiq', name:'InboxIQ', lbl:'Email Intelligence', icon:'📬', href:'inboxiq.html', icoStyle:'background:rgba(96,165,250,.12)', status:'s-agent', statusLabel:'MCP DEMO', sub:'Gmail intelligence system — demo inbox for portfolio', accent:'#60a5fa', live: false },
+  { id:'threatlens', name:'ThreatLens', lbl:'Cyber Intel', icon:'🛡', href:'threatlens.html', icoStyle:'background:rgba(45,212,191,.12)', status:'s-live', statusLabel:'LIVE', sub:'IOC · CVE · Threat Actor research', accent:'#2dd4bf', live: true },
   { id:'exposureiq', name:'ExposureIQ', lbl:'Exposure Mgmt', icon:'⚠️', href:'exposureiq.html', icoStyle:'background:rgba(45,212,191,.12)', status:'s-live', statusLabel:'LIVE FEEDS', sub:'NVD · CISA KEV · Asset risk', accent:'#2dd4bf', live: true },
-  { id:'techbrief', name:'TechBrief', lbl:'Daily Intel', icon:'📰', href:'techbrief.html', icoStyle:'background:rgba(96,165,250,.1)', status:'s-search', statusLabel:'WEB SEARCH', sub:'AI · Cyber · Dev · NZ Tech', accent:'#60a5fa', live: true },
+  { id:'techbrief', name:'TechBrief', lbl:'Tech Intelligence', icon:'📰', href:'techbrief.html', icoStyle:'background:rgba(96,165,250,.1)', status:'s-search', statusLabel:'WEB SEARCH', sub:'Live search · AI · Cyber · Dev · NZ Tech', accent:'#60a5fa', live: true },
   { id:'cortex', name:'Cortex', lbl:'Second Brain', icon:'🧠', href:'cortex.html', icoStyle:'background:rgba(192,132,252,.12)', status:'s-memory', statusLabel:'LIVE STORAGE', sub:'Save ideas · Auto-tag · Chat', accent:'#c084fc', live: true },
   { id:'forge', name:'Forge', lbl:'Workout Coach', icon:'💪', href:'forge.html', icoStyle:'background:rgba(251,146,60,.12)', status:'s-search', statusLabel:'LIVE STORAGE', sub:'PPL programme · Session log', accent:'#fb923c', live: true },
-  { id:'capitallens', name:'CapitalLens', lbl:'NZ Finance', icon:'📊', href:'capitallens.html', icoStyle:'background:rgba(240,184,48,.12)', status:'s-demo', statusLabel:'DEMO DATA', sub:'Live NZ rates · Demo profile', accent:'#f0b830', live: false },
+  { id:'capitallens', name:'CapitalLens', lbl:'Financial Intelligence', icon:'📊', href:'capitallens.html', icoStyle:'background:rgba(240,184,48,.12)', status:'s-demo', statusLabel:'DEMO DATA', sub:'Live NZ rates · demo financial profile', accent:'#f0b830', live: false },
 ];
 
 function renderTiles(forgeData, cortexData) {
@@ -852,7 +852,7 @@ async function init() {
 
   const [forgeData, cortexData] = await Promise.all([readForge(), readCortex()]);
   renderTiles(forgeData, cortexData);
-  document.getElementById('pillText').textContent = '7 AGENTS';
+  document.getElementById('pillText').textContent = '7 SYSTEMS';
 
   const briefDelay = /Mobi|Android|iPhone/i.test(navigator.userAgent) ? 3000 : 1500;
   setTimeout(() => generateBrief(forgeData, cortexData), briefDelay);
